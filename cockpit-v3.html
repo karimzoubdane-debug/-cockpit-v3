@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COCKPIT V3 — Flash IA — Karim Zoubdane 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+--bg: #0d1117;
+--bg2: #161b22;
+--bg3: #1c2333;
+--bg4: #212842;
+--border: #2a3045;
+--border2: #3a4560;
+--blue: #2f6fd4;
+--blue-l: #4a8ae8;
+--blue-dim: rgba(47,111,212,0.12);
+--silver: #8b9ab5;
+--text: #e2e8f0;
+--text-m: #6b7fa3;
+--white: #f8fafc;
+--green: #22c55e;
+--orange: #f59e0b;
+--red: #ef4444;
+--radius: 10px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+font-family: 'Sora', sans-serif;
+background: var(--bg);
+color: var(--text);
+min-height: 100vh;
+}
+
+/* HEADER */
+header {
+background: var(--bg2);
+border-bottom: 1px solid var(--border);
+padding: 20px 32px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+flex-wrap: wrap;
+gap: 16px;
+position: sticky;
+top: 0;
+z-index: 50;
+}
+
+.logo {
+font-size: 13px;
+font-weight: 700;
+letter-spacing: 3px;
+text-transform: uppercase;
+color: var(--white);
+}
+.logo span { color: var(--blue-l); }
+
+.header-stats {
+display: flex;
+gap: 24px;
+align-items: center;
+flex-wrap: wrap;
+}
+
+.hstat { text-align: center; }
+.hstat-val { font-size: 22px; font-weight: 800; color: var(--white); line-height: 1; }
+.hstat-lbl { font-size: 10px; color: var(--text-m); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+.btn {
+background: var(--blue);
+color: #fff;
+border: none;
+padding: 9px 18px;
+border-radius: 7px;
+font-family: 'Sora', sans-serif;
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+transition: background 0.2s;
+}
+.btn:hover { background: var(--blue-l); }
+.btn-ghost {
+background: transparent;
+border: 1px solid var(--border2);
+color: var(--silver);
+}
+.btn-ghost:hover { border-color: var(--blue); color: var(--blue-l); background: var(--blue-dim); }
+
+/* FLASH IA */
+.flash-ia {
+margin: 0 32px 20px 32px;
+background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+border: 1px solid var(--blue);
+border-radius: 12px;
+padding: 20px;
+}
+.flash-header {
+display: flex;
+align-items: center;
+gap: 12px;
+margin-bottom: 16px;
+flex-wrap: wrap;
+}
+.flash-title { font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--blue-l); font-size: 13px; }
+.flash-date { font-size: 11px; color: var(--text-m); margin-left: auto; }
+.flash-content { font-size: 13px; line-height: 1.6; }
+.flash-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+gap: 16px;
+margin-bottom: 16px;
+}
+.flash-card {
+background: rgba(255,255,255,0.03);
+border-radius: 8px;
+padding: 12px;
+border: 1px solid var(--border);
+}
+.flash-card h4 {
+font-size: 12px;
+font-weight: 700;
+margin-bottom: 8px;
+color: var(--blue-l);
+}
+.flash-card p { font-size: 12px; color: var(--text-m); margin: 4px 0; }
+.flash-emails {
+background: rgba(107,127,163,0.05);
+border-radius: 8px;
+padding: 12px;
+margin-top: 8px;
+}
+.email-item {
+font-size: 12px;
+padding: 6px 0;
+border-bottom: 1px solid var(--border);
+}
+.loading {
+text-align: center;
+padding: 20px;
+color: var(--text-m);
+}
+.error {
+color: var(--orange);
+text-align: center;
+padding: 20px;
+}
+
+/* TOOLBAR */
+.toolbar {
+padding: 14px 32px;
+display: flex;
+gap: 8px;
+align-items: center;
+flex-wrap: wrap;
+border-bottom: 1px solid var(--border);
+background: var(--bg2);
+}
+
+.chip {
+background: transparent;
+border: 1px solid var(--border);
+color: var(--text-m);
+padding: 5px 14px;
+border-radius: 20px;
+font-size: 11px;
+font-family: 'Sora', sans-serif;
+font-weight: 500;
+cursor: pointer;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+transition: all 0.15s;
+}
+.chip:hover, .chip.active {
+background: var(--blue-dim);
+border-color: var(--blue);
+color: var(--blue-l);
+}
+
+.search-input {
+margin-left: auto;
+background: var(--bg3);
+border: 1px solid var(--border);
+color: var(--text);
+padding: 6px 14px;
+border-radius: 7px;
+font-family: 'Sora', sans-serif;
+font-size: 12px;
+outline: none;
+width: 220px;
+transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--blue); }
+.search-input::placeholder { color: var(--text-m); }
+
+/* MAIN */
+.main { padding: 28px 32px; }
+
+.section-label {
+font-size: 10px;
+font-weight: 700;
+letter-spacing: 2.5px;
+text-transform: uppercase;
+color: var(--text-m);
+padding: 0 0 12px 2px;
+border-bottom: 1px solid var(--border);
+margin-bottom: 18px;
+}
+
+.section-block { margin-bottom: 40px; }
+
+.grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+gap: 16px;
+}
+
+/* CARD */
+.card {
+background: var(--bg2);
+border: 1px solid var(--border);
+border-radius: var(--radius);
+padding: 20px;
+cursor: pointer;
+transition: all 0.2s;
+position: relative;
+display: flex;
+flex-direction: column;
+gap: 12px;
+}
+.card:hover {
+border-color: var(--blue);
+transform: translateY(-2px);
+box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.card-top {
+display: flex;
+align-items: flex-start;
+justify-content: space-between;
+gap: 10px;
+}
+
+.card-title {
+font-size: 14px;
+font-weight: 700;
+color: var(--white);
+line-height: 1.3;
+}
+
+.badge {
+display: inline-flex;
+align-items: center;
+gap: 5px;
+padding: 3px 9px;
+border-radius: 12px;
+font-size: 10px;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+white-space: nowrap;
+flex-shrink: 0;
+}
+.badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+.badge.actif { background: rgba(34,197,94,0.12); color: #4ade80; border: 1px solid rgba(34,197,94,0.25); }
+.badge.actif::before { background: #22c55e; box-shadow: 0 0 6px #22c55e; animation: pulse 1.5s infinite; }
+.badge.planifie { background: rgba(107,127,163,0.12); color: var(--silver); border: 1px solid var(--border); }
+.badge.planifie::before { background: var(--silver); }
+.badge.termine { background: rgba(47,111,212,0.12); color: var(--blue-l); border: 1px solid rgba(47,111,212,0.25); }
+.badge.termine::before { background: var(--blue-l); }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.card-desc {
+font-size: 12px;
+color: var(--text-m);
+line-height: 1.55;
+border-left: 2px solid var(--border2);
+padding-left: 10px;
+}
+
+.prog-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-size: 11px;
+color: var(--text-m);
+}
+.prog-pct { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--white); font-size: 13px; }
+.prog-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 5px; }
+.prog-fill { height: 100%; border-radius: 2px; background: var(--blue); transition: width 0.6s ease; }
+.prog-fill.high { background: var(--green); }
+.prog-fill.med { background: var(--blue); }
+.prog-fill.low { background: var(--orange); }
+
+.card-footer {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding-top: 10px;
+border-top: 1px solid var(--border);
+font-size: 11px;
+color: var(--text-m);
+}
+.link-detail { color: var(--blue-l); font-size: 11px; font-weight: 600; }
+
+/* MODAL */
+.overlay {
+position: fixed; inset: 0;
+background: rgba(0,0,0,0.8);
+backdrop-filter: blur(6px);
+z-index: 100;
+display: none;
+padding: 20px;
+overflow-y: auto;
+}
+.overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+
+.modal {
+background: var(--bg2);
+border: 1px solid var(--border2);
+border-radius: 14px;
+width: 100%;
+max-width: 800px;
+margin: auto;
+overflow: hidden;
+animation: fadeUp 0.25s ease;
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+.modal-hdr {
+background: var(--bg3);
+padding: 24px 28px;
+border-bottom: 1px solid var(--border);
+display: flex;
+align-items: flex-start;
+gap: 14px;
+position: relative;
+}
+.modal-hdr-text { flex: 1; }
+.modal-hdr-title { font-size: 20px; font-weight: 800; color: var(--white); }
+.modal-hdr-sub { font-size: 12px; color: var(--text-m); margin-top: 4px; line-height: 1.5; }
+.btn-x {
+position: absolute; top: 16px; right: 16px;
+background: var(--bg4); border: 1px solid var(--border);
+color: var(--silver); width: 30px; height: 30px;
+border-radius: 50%; cursor: pointer; font-size: 14px;
+display: flex; align-items: center; justify-content: center;
+transition: all 0.15s;
+}
+.btn-x:hover { background: var(--red); color: #fff; border-color: var(--red); }
+
+.modal-body { padding: 24px 28px; }
+
+.modal-prog-bloc {
+display: flex; gap: 20px; align-items: center;
+background: var(--bg3);
+border: 1px solid var(--border);
+border-radius: var(--radius);
+padding: 16px 20px;
+margin-bottom: 20px;
+}
+.big-pct { font-size: 48px; font-weight: 800; color: var(--white); font-family: 'DM Mono', monospace; flex-shrink: 0; line-height: 1; }
+.big-pct span { font-size: 22px; color: var(--silver); }
+.prog-detail { flex: 1; }
+.prog-detail-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin: 8px 0; }
+.prog-detail-fill { height: 100%; background: var(--blue); border-radius: 3px; }
+.prog-detail-label { font-size: 11px; color: var(--text-m); }
+
+.phases-ttl {
+font-size: 10px; font-weight: 700; letter-spacing: 2px;
+text-transform: uppercase; color: var(--text-m);
+margin-bottom: 12px;
+}
+
+.phase {
+margin-bottom: 12px;
+border: 1px solid var(--border);
+border-radius: 8px;
+overflow: hidden;
+}
+.phase-hdr {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 11px 14px;
+background: var(--bg3);
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.phase.done .dot { background: var(--green); }
+.phase.in_progress .dot { background: var(--blue-l); animation: pulse 1.5s infinite; }
+.phase.todo .dot { background: var(--border2); }
+.phase-name { font-size: 13px; font-weight: 600; color: var(--white); flex: 1; }
+.phase-tag {
+font-size: 10px; font-weight: 700; text-transform: uppercase;
+padding: 2px 8px; border-radius: 10px;
+}
+.phase.done .phase-tag { background: rgba(34,197,94,0.15); color: #4ade80; }
+.phase.in_progress .phase-tag { background: rgba(47,111,212,0.15); color: var(--blue-l); }
+.phase.todo .phase-tag { background: rgba(107,127,163,0.1); color: var(--silver); }
+
+.phase-items { padding: 12px 14px 12px 32px; display: flex; flex-direction: column; gap: 6px; }
+.phase-items li {
+font-size: 12px; color: var(--text-m); list-style: none;
+position: relative; padding-left: 14px; line-height: 1.5;
+}
+.phase.done .phase-items li::before { content: '✓'; position: absolute; left: 0; color: var(--green); font-size: 11px; font-weight: 700; }
+.phase.in_progress .phase-items li::before { content: '›'; position: absolute; left: 0; color: var(--blue-l); font-size: 14px; }
+.phase.todo .phase-items li::before { content: '–'; position: absolute; left: 0; color: var(--border2); }
+
+.livrables-ttl {
+font-size: 10px; font-weight: 700; letter-spacing: 2px;
+text-transform: uppercase; color: var(--text-m);
+margin: 20px 0 10px;
+}
+.livrable-item {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 9px 12px;
+border: 1px solid var(--border);
+border-radius: 7px;
+margin-bottom: 6px;
+background: var(--bg3);
+}
+.livrable-name { font-size: 12px; color: var(--text); font-weight: 500; }
+.livrable-type { font-size: 10px; color: var(--text-m); font-family: 'DM Mono', monospace; }
+.btn-open {
+background: var(--blue-dim);
+border: 1px solid rgba(47,111,212,0.3);
+color: var(--blue-l);
+padding: 4px 12px;
+border-radius: 5px;
+font-size: 11px;
+font-weight: 600;
+cursor: pointer;
+text-decoration: none;
+font-family: 'Sora', sans-serif;
+transition: all 0.15s;
+}
+.btn-open:hover { background: var(--blue); color: #fff; }
+
+.stack-bloc {
+margin-top: 16px; padding: 12px 14px;
+background: var(--bg3);
+border: 1px solid var(--border);
+border-radius: 8px;
+}
+.stack-lbl { font-size: 10px; color: var(--text-m); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.stack-val { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--blue-l); line-height: 1.6; }
+
+.next-step-bloc {
+background: rgba(245,158,11,0.07);
+border: 1px solid rgba(245,158,11,0.2);
+border-radius: 7px;
+padding: 10px 14px;
+margin-bottom: 16px;
+}
+.next-step-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--orange); margin-bottom: 4px; }
+.next-step-val { font-size: 12px; color: var(--text); line-height: 1.5; }
+
+.edit-bar {
+display: flex; gap: 8px; flex-wrap: wrap;
+padding: 14px 28px;
+border-top: 1px solid var(--border);
+background: var(--bg3);
+}
+.btn-edit { background: var(--bg4); border: 1px solid var(--border2); color: var(--silver); padding: 7px 16px; border-radius: 6px; font-family: 'Sora', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.btn-edit:hover { border-color: var(--blue); color: var(--blue-l); }
+
+.form-modal .modal-body { padding: 24px 28px; max-height: 75vh; overflow-y: auto; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 11px; font-weight: 600; color: var(--text-m); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+.form-group input, .form-group textarea, .form-group select {
+width: 100%; background: var(--bg3); border: 1px solid var(--border);
+border-radius: 7px; color: var(--text); padding: 9px 13px;
+font-family: 'Sora', sans-serif; font-size: 13px; outline: none;
+transition: border-color 0.2s;
+}
+.form-group input:focus, .form-group textarea:focus { border-color: var(--blue); }
+.form-group select option { background: var(--bg2); }
+.form-group textarea { min-height: 70px; resize: vertical; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.btn-submit { width: 100%; background: var(--blue); color: #fff; border: none; padding: 12px; border-radius: 8px; font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s; margin-top: 6px; }
+.btn-submit:hover { background: var(--blue-l); }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
+
+@media(max-width:640px){
+header, .toolbar, .main, .flash-ia { padding-left: 16px; padding-right: 16px; margin-left: 0; margin-right: 0; }
+.grid { grid-template-columns: 1fr; }
+.form-row { grid-template-columns: 1fr; }
+.modal-hdr, .modal-body, .edit-bar { padding-left: 16px; padding-right: 16px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">Cockpit <span>Projets</span> — Karim Zoubdane 2026</div>
+<div class="header-stats">
+<div class="hstat"><div class="hstat-val" id="s-total">0</div><div class="hstat-lbl">Projets</div></div>
+<div class="hstat"><div class="hstat-val" id="s-actifs">0</div><div class="hstat-lbl">Actifs</div></div>
+<div class="hstat"><div class="hstat-val" id="s-avg">0%</div><div class="hstat-lbl">Avancement moy.</div></div>
+<button class="btn" onclick="openAdd()">+ Nouveau projet</button>
+</div>
+</header>
+
+<div class="flash-ia" id="flash-ia">
+<div class="flash-header">
+<div class="flash-title">Flash IA — Rapport quotidien</div>
+<div class="flash-date" id="flash-date"></div>
+<button class="btn-ghost" style="padding: 4px 12px; font-size: 11px;" onclick="refreshFlash()">Rafraichir</button>
+</div>
+<div class="flash-content" id="flash-content">
+<div class="loading">Chargement du rapport matinal...</div>
+</div>
+</div>
+
+<div class="toolbar">
+<button class="chip active" onclick="filter('all',this)">Tous</button>
+<button class="chip" onclick="filter('actif',this)">En cours</button>
+<button class="chip" onclick="filter('planifie',this)">Planifies</button>
+<button class="chip" onclick="filter('termine',this)">Termines</button>
+<button class="chip" onclick="filter('agent',this)">Agents IA</button>
+<input class="search-input" type="text" placeholder="Rechercher un projet..." oninput="search(this.value)">
+</div>
+
+<div class="main" id="main"></div>
+
+<div class="overlay" id="ov-detail" onclick="closeOv(event,'ov-detail')">
+<div class="modal">
+<div class="modal-hdr" id="d-hdr"></div>
+<div class="modal-body" id="d-body"></div>
+<div class="edit-bar">
+<button class="btn-edit" id="btn-edit-proj">Modifier ce projet</button>
+<button class="btn-edit" id="btn-del-proj" style="color:#ef4444;border-color:#ef4444">Supprimer</button>
+</div>
+</div>
+</div>
+
+<div class="overlay form-modal" id="ov-form" onclick="closeOv(event,'ov-form')">
+<div class="modal">
+<div class="modal-hdr">
+<div class="modal-hdr-text">
+<div class="modal-hdr-title" id="form-title">Nouveau projet</div>
+<div class="modal-hdr-sub">Remplissez les champs</div>
+</div>
+<button class="btn-x" onclick="closeForm()">X</button>
+</div>
+<div class="modal-body">
+<input type="hidden" id="f-id">
+<div class="form-group">
+<label>Nom du projet</label>
+<input type="text" id="f-title" placeholder="Ex: Plateforme Web Voyages21.com">
+</div>
+<div class="form-group">
+<label>Description courte</label>
+<textarea id="f-desc" placeholder="Expliquez l'objet du projet..."></textarea>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Statut</label>
+<select id="f-status">
+<option value="actif">En cours</option>
+<option value="planifie">Planifie</option>
+<option value="termine">Termine</option>
+</select>
+</div>
+<div class="form-group">
+<label>Categorie</label>
+<select id="f-cat">
+<option value="business">Business Voyages 21</option>
+<option value="eco">Ecotourisme & Immobilier</option>
+<option value="web">Creation de Sites Web</option>
+<option value="agent">Armee des Anges — Agents IA</option>
+<option value="veille">Veille & Expertise</option>
+</select>
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Avancement (%)</label>
+<input type="number" id="f-prog" min="0" max="100" placeholder="0">
+</div>
+<div class="form-group">
+<label>Prochaine etape</label>
+<input type="text" id="f-next" placeholder="Ex: Configurer HubSpot CRM">
+</div>
+</div>
+<div class="form-group">
+<label>Stack technologique</label>
+<input type="text" id="f-stack" placeholder="Ex: Next.js · Sanity.io · Vercel">
+</div>
+<button class="btn-submit" onclick="saveProject()">Enregistrer le projet</button>
+</div>
+</div>
+</div>
+
+<script>
+const defaultProjects = [
+{ id:1, cat:'business', status:'actif', title:'Plateforme Web Voyages21.com', desc:"Refonte complete du site vitrine et de reservation en Next.js avec 4 langues (FR/EN/ES/DE), connecte a Sanity CMS, HubSpot CRM, Make.com, Rewardful.", nextStep:"Demarrer les pages site — Phase 3 : Page d'accueil en priorite", stack:"Next.js · Tailwind CSS · Sanity.io · Vercel Pro · GitHub · HubSpot · Make.com · DeepL · Rewardful · PayPal", livrables:[{name:"Feuille de Route — Site Voyages21", type:"Google Doc", url:"https://docs.google.com/document/d/1O-8jWqXlBProA3IYCUjmTUDYckE4FzT4v9363Pzo9VY/edit"},{name:"Decision Phase 2 Photos — Vision API", type:"Google Doc", url:"https://docs.google.com/document/d/1GLlZ7W_fdRYRthyj9fq1LQvsiDyX6-9eV8R9RPHA1yQ/edit"},{name:"Site en ligne (Vercel)", type:"URL", url:"https://voyages21.vercel.app"}], phases:[{name:"Phase 1 — Infrastructure", state:"done", items:["VS Code installe","Node.js v24 + npm v11","Next.js + Tailwind CSS cree","GitHub : karimzoubdane-debug/voyages21","Vercel : voyages21.vercel.app en ligne","Sanity.io CMS installe","Google Drive dossiers photos crees"]},{name:"Phase 2 — Automatisation Photos", state:"in_progress", items:["Script Google Apps Script + Vision AI (en cours)","Dispatch par mot-cle dans nom de fichier","DECISION : Switcher Claude Vision API (~$0.003/photo) apres fin du site","Renommage SEO automatique FR+EN"]},{name:"Phase 3 — Pages Site", state:"todo", items:["Page d'accueil","Page Circuits","Pages Activites","Page Contact / Devis","Integration Sanity (contenu)","4 langues : FR / EN / ES / DE"]},{name:"Phase 4 — Lancement", state:"todo", items:["Connecter domaine voyages21.com (Valablue → Vercel)","Migration emails AVANT quitter Valablue","Make.com automations","HubSpot CRM operationnel","Rewardful affiliation","DeepL integration"]}] },
+{ id:2, cat:'business', status:'actif', title:'Dossier Strategique B2B — Voyages 21', desc:"Production du catalogue complet des activites Voyages 21, de la presentation agence (78 slides), des grilles tarifaires multi-devises (MAD/USD/EUR) et de la strategie de prospection internationale B2B.", nextStep:"Finaliser la strategie OTA et configurer le pipeline HubSpot", stack:"PowerPoint · Google Drive · HTML/JS (configurateur) · HubSpot", livrables:[{name:"Presentation Agence Voyages21 (78 slides)", type:"PPTX", url:"https://drive.google.com/file/d/1WtcA3Go0SsV7H-muLXOV7K0AW_0XuJg2/view"},{name:"Presentation Agence — Partie 2", type:"PPTX", url:"https://drive.google.com/file/d/1l_lAGzeqSyB7lFfHJYZ9cNKpgidWdc4_/view"},{name:"Catalogue Voyages 21 — Merged", type:"PDF", url:"https://drive.google.com/file/d/1bUqIB3MkF7yQmzB_HtuTj2YwUr_tgSBk/view"}], phases:[{name:"Catalogue & Presentation", state:"done", items:["78 slides master B2B PPTX produit","Grilles tarifaires MAD/USD/EUR","Analyse OTA : Viator, Civitatis, Airbnb Experiences","Analyse marches Maroc 2026 (2,48 Mds USD)"]},{name:"Strategie Prospection", state:"in_progress", items:["SWOT Voyages 21 complet","Plan 12 mois — Budget ~217 400 MAD","Canaux : LinkedIn, Brevo, DMCFinder, ATTA","Salons cibles : WTM London / ITB Berlin"]},{name:"CRM & Deploiement", state:"todo", items:["HubSpot CRM pipeline B2B configure","Sequences emails Brevo","Reporting KPIs mensuel"]}] },
+{ id:3, cat:'business', status:'actif', title:'Application Devis & Tarification', desc:"Outil web standalone (HTML/JavaScript) permettant a l'equipe finance de generer des devis clients en important les tarifs depuis les contrats hotels (Google Drive). Generation PDF automatique.", nextStep:"Developper l'interface de saisie et le moteur de calcul des marges", stack:"HTML · JavaScript · Google Drive API · PDF.js", livrables:[], phases:[{name:"Conception", state:"done", items:["Architecture standalone HTML/JS validee","Contrats hotels Drive = source de donnees","Equipe finance = utilisateurs cibles"]},{name:"Developpement", state:"in_progress", items:["Interface saisie devis","Import tarifs hotels depuis contrats","Calcul automatique marges et prix vente","Export PDF devis client"]},{name:"Deploiement", state:"todo", items:["Tests avec equipe finance","Formation utilisateurs","Mise en production","Mises a jour tarifaires regulieres"]}] },
+{ id:4, cat:'business', status:'actif', title:'Strategie Commerciale Incoming', desc:"Plan complet de developpement commercial B2B pour attirer des Tour Operateurs et agences partenaires en Europe et Chine. Inclut strategie OTA, programme d'affiliation influenceurs, gestion CRM.", nextStep:"Configurer le pipeline HubSpot et lancer les sequences Brevo", stack:"HubSpot · Brevo · Make.com · LinkedIn · Viator · Civitatis · Rewardful", livrables:[{name:"Analyse OTA & Strategie Experiences Maroc", type:"Google Doc", url:"https://docs.google.com/document/d/1rT0Ef_D5dhan9VtSeV2aWyjK1cFfiviXsw1KNQtyqrc/edit"},{name:"Tendances Touristiques Maroc 2026 — 20 offres", type:"Google Doc", url:"https://docs.google.com/document/d/1usf6PXZsJ89L8XTihXRRfJuAA14w9SghUtWa0AjZuSk/edit"}], phases:[{name:"Analyse & Strategie", state:"done", items:["Analyse OTA : Viator/Civitatis/Airbnb","Tendances marche Maroc 2026","SWOT et positionnement Voyages 21","Circuits Golf & Casino VIP definis"]},{name:"Affiliation Influenceurs", state:"in_progress", items:["Criteres : Voyage/Luxe, Engagement >3%","Audience cible : Europe / Chine / USA","Plateforme Rewardful — commissions transparentes"]},{name:"CRM & Automation", state:"todo", items:["Pipeline HubSpot B2B","Sequences Brevo automatiques","Nurturing prospects 30 jours"]},{name:"OTAs — Referencement", state:"todo", items:["Inscription Viator (licence commerciale)","Dossier Civitatis (marche FR/ES)","Airbnb Experiences (guides experts)"]}] },
+{ id:5, cat:'business', status:'planifie', title:'Marketing Digital & Publicite', desc:"Automatisation de la presence sur les reseaux sociaux de Voyages 21 et HAYDEN 21 : generation de contenu par IA, planning editorial 30 jours a l'avance, campagnes publicitaires Meta Ads et Google Ads.", nextStep:"Definir les outils de generation de contenu et le calendrier editorial", stack:"Make.com · Midjourney · Meta Ads · Google Ads · Buffer", livrables:[], phases:[{name:"Architecture Concept", state:"done", items:["Concept Ange Createur valide","Objectif : 30 jours de contenu en avance","Canaux : Instagram, Facebook, LinkedIn, TikTok"]},{name:"Production de Contenu", state:"todo", items:["Generation posts IA (images + textes)","Planification automatique","Calendrier editorial 30j"]},{name:"Campagnes Payantes", state:"todo", items:["Meta Ads (Facebook/Instagram)","Google Ads (Search + Display)","Reporting automatique hebdomadaire"]}] },
+{ id:6, cat:'business', status:'planifie', title:'Conciergerie 2.0 — Gestion Locative', desc:"Systeme de gestion de proprietes en location courte duree via Hospitable. Automatisation des reservations, communication clients, menages et KPIs.", nextStep:"Finaliser le modele de commission et configurer Hospitable", stack:"Hospitable · Airbnb · Booking.com · Make.com · HubSpot", livrables:[], phases:[{name:"Cadrage", state:"done", items:["Plateforme Hospitable selectionnee","Modele de commission a definir","Partenariat Ciel d'Afrique (montgolfiere) analyse"]},{name:"Configuration", state:"todo", items:["Hospitable paramatre","Connexion Airbnb + Booking.com","Templates communications automatiques"]},{name:"Deploiement", state:"todo", items:["Onboarding premiers proprietaires","Reporting mensuel KPIs","Facturation automatique"]}] },
+{ id:7, cat:'eco', status:'actif', title:'HAYDEN 21 — Complexe Ecotourisme Tamazouzte', desc:"Creation d'un complexe d'animation ecotouristique a Tamazouzte (Al Haouz) comprenant e-bike, ateliers cuisine marocaine et paintball. Dossier de financement soumis (Go Siyaha, Intelaka CMT).", nextStep:"Obtenir la reponse de financement Go Siyaha / Intelaka CMT", stack:"Business Plan · Financement Go Siyaha · Intelaka CMT", livrables:[{name:"Business Plan HAYDEN 21 (Claude)", type:"DOCX", url:"https://drive.google.com/file/d/1aqGhv181fDcB_TDIANwH_Ix3Dr3DLkSV/view"},{name:"Etude Projet HAYDEN 21", type:"DOCX", url:"https://drive.google.com/file/d/1n2ChB6fynBrDm7KmeP1QJtokzVTPF-VH/view"},{name:"Projet Consolide VF", type:"DOCX", url:"https://drive.google.com/file/d/10mxTLptyvLRsz3MM3eCwNb4Gvtf3BLHL/view"},{name:"Presentation Delegation Tourisme", type:"DOCX", url:"https://drive.google.com/file/d/1-U1udaxjQGBMe6rKeniT0Yg6FbeDXWew/view"},{name:"BP May 25 — Banque", type:"PDF", url:"https://drive.google.com/file/d/1upkZH3W3MDQHU59im3a26DHBiHTutXcL/view"},{name:"Etude Financiere HAYDEN", type:"XLSX", url:"https://drive.google.com/file/d/1OyX_me6rzGxY7MNrA4hqt6lIa2ogGEnv/view"}], phases:[{name:"Business Plan & Financement", state:"done", items:["Business plan complet redige","Budget total ~723 500 MAD","Subvention Go Siyaha ~39% modelisee","Intelaka CMT 1,75% / 7 ans","Presentation delegation tourisme"]},{name:"Dossier de Financement", state:"in_progress", items:["Dossier soumis","En attente reponse financement"]},{name:"Travaux & Amenagement", state:"todo", items:["Amenagement terrain Tamazouzte","Equipements VTT e-bike","Espace cuisine + paintball","Signaletique et accueil"]},{name:"Ouverture Commerciale", state:"todo", items:["Site web HAYDEN 21","Referencement OTA","Partenariats Voyages 21","Lancement operationnel"]}] },
+{ id:8, cat:'eco', status:'planifie', title:"Maison d'Hotes — Domaine Labdadz", desc:"Projet de creation d'une maison d'hotes de charme sur le terrain agricole familial a Tamazouzte. Strategie reglementaire basee sur la regle des 2% de couverture au sol.", nextStep:"Valider la strategie reglementaire et les plans architecturaux", stack:"Architecture · Reglementation fonciere · Booking.com · Airbnb", livrables:[], phases:[{name:"Cadrage Reglementaire", state:"done", items:["Regle 2% couverture sol (terrain agricole)","Option declaration residence privee analysee","Terrain : Tamazouzte, Al Haouz"]},{name:"Conception", state:"todo", items:["Plans architecturaux","Dossier de permis","Budget travaux"]},{name:"Amenagement", state:"todo", items:["Construction","Decoration & mobilier","Jardins et espaces exterieurs"]},{name:"Exploitation", state:"todo", items:["Referencement Airbnb / Booking","Integration Conciergerie 2.0","Coordination avec HAYDEN 21"]}] },
+{ id:9, cat:'eco', status:'actif', title:'Oliveraie — Domaine Labdadz', desc:"Gestion agronomique et commerciale de 2 hectares d'oliviers adultes sur le domaine Labdadz. Programme de fertilisation micronutriments (Fertilink Mn+Zn), irrigation, valorisation de l'huile d'olive.", nextStep:"Mettre en oeuvre le programme de fertilisation Fertilink saison 2026", stack:"Fertilink Mn+Zn · Irrigation goutte-a-goutte · Analyses sol", livrables:[], phases:[{name:"Diagnostic & Programme", state:"done", items:["2 hectares oliviers adultes","Programme Fertilink Mn+Zn defini","Gestion micronutriments"]},{name:"Saison 2026", state:"in_progress", items:["Application Fertilink","Suivi irrigation","Taille et entretien"]},{name:"Valorisation", state:"todo", items:["Production huile d'olive","Certification / Label","Commercialisation (circuits courts, boutique)"]}] },
+{ id:10, cat:'web', status:'actif', title:'Agence Web IA — Creation Industrielle de Sites', desc:"Service de creation rapide de sites web clients via workflow automatise : message WhatsApp audio → transcription → Google Drive → generation Claude → livraison HTML/Tailwind. 3 formules (Vitrine, Booking, Premium).", nextStep:"Realiser le site La Maisonnette (Site 2 — 3 suites, jardin, piscine)", stack:"HTML · Tailwind CSS · Web3Forms · Bookeo · Tawk.to · Make.com · Claude API", livrables:[{name:"Site DA21 — Livre (Multi-pages Premium)", type:"HTML", url:"https://drive.google.com/drive/folders/1wgeQ1amnDxx5XaREGGJeAzeW7OGYquV1"}], phases:[{name:"Methode & Formules", state:"done", items:["3 formules : Vitrine / Booking / Premium","Prompt Maitre V2 cree (SEO, Schema.org, Web3Forms)","Workflow WhatsApp → Make → Claude → HTML"]},{name:"Site 1 — DA21 (Livré)", state:"done", items:["Multi-pages Premium ~2200 lignes","VTT 350/500/750 · Paintball 250/400/550 · Cuisine 650/900/1200 MAD","Bookeo + Tawk.to chat integre"]},{name:"Site 2 — La Maisonnette", state:"in_progress", items:["3 suites + jardin 2000m² + piscine + pergola","A construire"]},{name:"Commercial", state:"todo", items:["Portfolio clients","Grille tarifaire finalisee","Processus de vente","Communication commerciale"]}] },
+{ id:11, cat:'web', status:'planifie', title:'Production Video IA', desc:"Creation de contenus video promotionnels pour Voyages 21, HAYDEN 21 et les clients, en utilisant des outils IA generatifs, Claude pour les scripts et la voix off multilingue.", nextStep:"Selectionner l'outil IA video et definir le workflow de production", stack:"Sora / Runway / Kling · Claude (scripts) · CapCut · Adobe Premiere", livrables:[], phases:[{name:"Cadrage", state:"todo", items:["Types video : circuits, activites, temoignages","Selection outil IA video","Workflow de production defini"]},{name:"Production", state:"todo", items:["Scripts automatises par Claude","Montage assiste IA","Voix off FR/EN/ES/DE"]},{name:"Distribution", state:"todo", items:["YouTube Voyages 21","Reseaux sociaux","Integration site web","Livraison clients (service facture)"]}] },
+{ id:12, cat:'agent', status:'planifie', title:'Agent Major — Maitre des Prompts', desc:"Agent IA expert en prompt engineering qui s'auto-forme sur les meilleures techniques (Chain-of-Thought, Tree of Thoughts). Traduit chaque intention en instructions precises pour les autres agents.", nextStep:"Rediger le prompt systeme de l'Agent Major et tester sur 3 cas reels", stack:"Claude API · Prompt Engineering · Google Drive (bibliotheque prompts)", livrables:[{name:"Architecture Agent Major", type:"Google Doc", url:"https://docs.google.com/document/d/1Lig8Aoo1bOYbmY-gOdXrMrhLAOiC28_xjSZt2DD54qw/edit"}], phases:[{name:"Concept defini", state:"done", items:["Auto-formation continue (OpenAI/Anthropic/Google)","Interface interactive : interroge avant d'agir","Genere Master Prompts ultra-precis","Bibliotheque prompts dans Drive"]},{name:"Configuration", state:"todo", items:["Prompt systeme redige","Tests sur cas reels Voyages 21","KPI Efficacite Prompt (score correction)"]},{name:"Production", state:"todo", items:["Operationnel pour tous les agents","Mise a jour automatique bibliotheque"]}] },
+{ id:13, cat:'agent', status:'planifie', title:"Agent Commandant — Chef d'Orchestre", desc:"Agent superviseur qui analyse le tableau de bord chaque matin, detecte les projets bloques, active les agents specialises et genere le Rapport Flash quotidien.", nextStep:"Definir le workflow Make.com et les seuils d'alerte par projet", stack:"Make.com · Airtable / Google Sheets · Claude API · Gmail / WhatsApp", livrables:[{name:"Architecture Agent Commandant", type:"Google Doc", url:"https://docs.google.com/document/d/1UO-o6u7gAjn5m7_UwuudwcG7aGlBWlc2N5sPabRkI0Y/edit"}], phases:[{name:"Concept defini", state:"done", items:["Analyse Dashboard chaque matin","Detecte blocages (projet bloque > 2 jours)","Active les agents specialises","Rapport Flash email / WhatsApp"]},{name:"Configuration", state:"todo", items:["Workflow Make.com (trigger horaire)","API Airtable — lecture KPIs","Seuils d'alerte par projet","Template Rapport Flash"]},{name:"Production", state:"todo", items:["Rapport matinal automatique 7h00","Alertes temps reel en cas de blocage"]}] },
+{ id:14, cat:'agent', status:'planifie', title:'Agent Veilleur — Sentinelle IA & Marche', desc:"Agent de monitoring qui surveille les actualites IA (Claude, GPT, Gemini, GLM), les tendances SEO et le marche du voyage au Maroc. Produit chaque semaine un resume des 5 innovations prioritaires.", nextStep:"Configurer les sources RSS et le workflow Make.com de collecte", stack:"Make.com · RSS / YouTube API · Claude API · Google Drive", livrables:[{name:"Strategie Veille & Analyse Concurrentielle", type:"Google Doc", url:"https://docs.google.com/document/d/1H5o7gdCENPX-qyWdjiSRanDTxmz8cYGxAjXA7AlBL60/edit"}], phases:[{name:"Concept defini", state:"done", items:["Sources : YouTube, RSS, Twitter/X, newsletters","Cibles : Claude, GPT-5.4, Gemini 3.1, GLM-5.1","Livrable : resume 5 innovations/semaine"]},{name:"Configuration", state:"todo", items:["Flux RSS configures","Trigger Make.com hebdomadaire","Synthese Claude API → Google Drive"]},{name:"Production", state:"todo", items:["Rapport hebdomadaire automatique","Alerte si innovation critique detectee"]}] },
+{ id:15, cat:'agent', status:'actif', title:'Agent Academique — Base de Connaissance', desc:"Agent transformateur de savoir passif en expertise active. Extrait les transcriptions des videos YouTube et articles, les analyse par IA pour creer des fiches pratiques (SOP) stockees dans Google Drive.", nextStep:"Automatiser le flux YouTube → transcription → synthese → Drive", stack:"YouTube Transcript API · Claude API · Make.com · Google Drive", livrables:[{name:"Analyse 11 videos Claude — PART 1 a 6", type:"PDF", url:"https://drive.google.com/drive/folders/1IBFFD8iYoYN3hUWS8kukbjbm6Wo1LJRH"},{name:"Recapitulatif Strategique Final", type:"Google Doc", url:"https://docs.google.com/document/d/1HwkapNsZA4eAHE5seLohqKbGJIC85AuyRUkmXVOlWUU/edit"}], phases:[{name:"Analyse manuelle realisee", state:"done", items:["11 videos YouTube analysees manuellement","PART 1 a 6 — PDF produits et stockes Drive","Recapitulatif Strategique Claude 2026 produit","Base de connaissance initiale constitute"]},{name:"Automatisation", state:"in_progress", items:["Workflow Make.com : YouTube → transcript → synthese","Stockage automatique Google Drive (nommage Date_Sujet)"]},{name:"Production continue", state:"todo", items:["Ingestion automatique nouvelles videos","Mise a jour base de connaissance hebdomadaire"]}] },
+{ id:16, cat:'agent', status:'planifie', title:'Agent Prospecteur — Partenaires & Influenceurs', desc:"Agent de sourcing qui identifie et qualifie automatiquement les influenceurs voyage (Instagram, YouTube) et les agences partenaires B2B en Europe et Chine. Filtre par niche, taux d'engagement, genere des emails personnalises.", nextStep:"Definir les criteres de filtrage et tester le premier scraping", stack:"Make.com · Claude API · Instagram API · YouTube API · Gmail", livrables:[], phases:[{name:"Concept defini", state:"done", items:["Criteres : Voyage/Luxe/Aventure, Engagement >3%","Audience : Europe / Chine / USA","Email personnalise citant leur derniere video"]},{name:"Configuration", state:"todo", items:["Scraping Instagram/YouTube (mots-cles cibles)","Base de donnees qualifiee (Nom/Audience/Contact/Score)","Template email outreach"]},{name:"Production", state:"todo", items:["Enrichissement continu de la base","Envoi automatique emails personnalises","Suivi reponses et relances"]}] },
+{ id:17, cat:'agent', status:'planifie', title:'Agent Createur — Contenu Social Media', desc:"Agent studio de contenu qui genere automatiquement posts, scripts et visuels pour Voyages 21 et HAYDEN 21, planifie 30 jours de contenu a l'avance sur tous les reseaux sociaux.", nextStep:"Definir la ligne editoriale et les templates de contenu par reseau", stack:"Make.com · Midjourney · Claude API · Buffer / Later · Canva API", livrables:[], phases:[{name:"Concept defini", state:"done", items:["Canaux : Instagram, Facebook, LinkedIn, TikTok","Objectif : 30 jours de contenu en avance","Connexion avec Agent Veilleur pour tendances"]},{name:"Configuration", state:"todo", items:["Templates posts par reseau","Generation visuels Midjourney / IA","Workflow planification automatique"]},{name:"Production", state:"todo", items:["Calendrier editorial rempli automatiquement","Reporting engagement hebdomadaire"]}] },
+{ id:18, cat:'agent', status:'planifie', title:'Agent Architecte — Web & Automatisation', desc:"Agent technique qui developpe les outils web, sites clients et workflows Make.com. Applique les techniques premium (Google Stitch + Claude Code, composants 21st.dev, Vibe Coding).", nextStep:"Documenter les standards techniques et le workflow de livraison clients", stack:"Claude Code · VS Code · Next.js · Make.com · Vercel · GitHub · Google Stitch", livrables:[], phases:[{name:"Concept defini", state:"done", items:["Google Stitch (design) + Claude Code (code)","Composants 21st.dev pour designs premium","Vibe Coding : app complete en 12 min","Deploiement automatique GitHub → Vercel"]},{name:"Configuration", state:"todo", items:["Bibliotheque composants 21st.dev","Templates projets standardises","Workflow livraison clients documente"]},{name:"Production", state:"todo", items:["Livraison sites clients en autonomie partielle","Audits Ultra Review avant livraison"]}] },
+{ id:19, cat:'agent', status:'planifie', title:'Agent Archiviste — Memoire & KPIs', desc:"Agent scribe qui lit les comptes-rendus de session stockes dans Google Drive, en extrait les KPIs et decisions cles, et met a jour automatiquement le tableau de bord.", nextStep:"Creer le template de compte-rendu standardise et le workflow Make.com", stack:"Make.com · Google Drive · Claude API · Google Sheets / Airtable", livrables:[{name:"Architecture Agent Archiviste", type:"Google Doc", url:"https://docs.google.com/document/d/1awS41Opq8L0EDbEOWwSczm4AsFj6uqLG7Q9RiPCZF0I/edit"}], phases:[{name:"Concept defini", state:"done", items:["Lit les CR Google Drive (nommage [PROJET]-DATE-TITRE)","Extrait : % realise / Reste a faire / KPI","Met a jour Dashboard automatiquement","Genere alerte si date Next Step depassee"]},{name:"Configuration", state:"todo", items:["Template CR standardise cree","Trigger Make.com : Watch New Files dans Drive","Parseur IA → extraction donnees structurees"]},{name:"Production", state:"todo", items:["Synchronisation continue Drive → Dashboard","Rapport hebdomadaire KPIs consolides"]}] },
+{ id:20, cat:'veille', status:'actif', title:'Veille Strategique IA — Formation Continue', desc:"Formation continue sur les capacites et evolutions de Claude et de ses concurrents (GPT-5.4, Gemini 3.1, GLM-5.1). Base de connaissance constituee dans Drive.", nextStep:"Appliquer les techniques Google Stitch et Skills Claude au projet Voyages 21", stack:"Claude · Obsidian · Google Drive · YouTube · Make.com", livrables:[{name:"PART 1 — Claude 4.7 Nouveautes", type:"PDF", url:"https://drive.google.com/file/d/15OyIAodGK_XBkBWAo-AOzIU7ZlFeQBb3/view"},{name:"PART 3 — Skills + Agents + Sites Premium", type:"PDF", url:"https://drive.google.com/file/d/1okYyDmoB6s-5KnJRIXCYgUm6rSeag-lb/view"},{name:"PART 4 — Vibe Coding + Fonctions avancees", type:"PDF", url:"https://drive.google.com/file/d/1AvYuVgHEQzy2GcfRzWJfK4nRNcEYPJ-8/view"},{name:"PART 5 — Obsidian + Architecture Advisor", type:"PDF", url:"https://drive.google.com/file/d/1aeZMKlIR4pWmFj5ijeOMsI-J4QtUL5jG/view"},{name:"PART 6 — Vision HD + Google Stitch", type:"PDF", url:"https://drive.google.com/file/d/1GQ6VwDPqKcYBGL7r-vBjr_iNJxPpibQ/view"},{name:"Recapitulatif General — Strategie Claude 2026", type:"Google Doc", url:"https://docs.google.com/document/d/1HwkapNsZA4eAHE5seLohqKbGJIC85AuyRUkmXVOlWUU/edit"}], phases:[{name:"Analyse 11 videos", state:"done", items:["Skills Claude (briques permanentes)","Equipe agents + revue croisee","Vibe Coding VS Code + Vercel","Obsidian + Claude Code (deuxieme cerveau)","Architecture Advisor Haiku/Opus (−50% couts)","Google Stitch + Claude Code (sites premium)"]},{name:"Application Pratique", state:"in_progress", items:["Appliquer Skills aux projets Voyages 21","Tester Google Stitch pour design site","Architecture Advisor pour automatisations"]},{name:"Veille Continue Automatisee", state:"todo", items:["Workflow YouTube → synthese → Drive","Agent Veilleur actif (Make.com + RSS)","Rapport hebdomadaire 5 innovations"]}] }
+];
+
+let projects = [];
+
+function persistProjects() {
+localStorage.setItem('cockpit_projects', JSON.stringify(projects));
+}
+
+function loadProjects() {
+const stored = localStorage.getItem('cockpit_projects');
+if (stored) {
+projects = JSON.parse(stored);
+} else {
+projects = JSON.parse(JSON.stringify(defaultProjects));
+persistProjects();
+}
+}
+
+function calcProg(p) {
+if (!p.phases || p.phases.length === 0) return 0;
+let total = 0, done = 0;
+p.phases.forEach(ph => {
+const n = ph.items.length;
+total += n;
+if (ph.state === 'done') done += n;
+else if (ph.state === 'in_progress') done += Math.ceil(n * 0.4);
+});
+return total === 0 ? 0 : Math.round((done / total) * 100);
+}
+
+const CATS = [
+{ key:'business', label:'Business Voyages 21' },
+{ key:'eco', label:'Ecotourisme & Immobilier' },
+{ key:'web', label:'Creation de Sites Web' },
+{ key:'agent', label:'Armee des Anges — Agents IA' },
+{ key:'veille', label:'Veille & Expertise' }
+];
+
+let currentFilter = 'all';
+let currentSearch = '';
+
+function render() {
+const main = document.getElementById('main');
+const visible = projects.filter(p => {
+const matchF = currentFilter === 'all' || p.status === currentFilter || p.cat === currentFilter;
+const matchS = !currentSearch || p.title.toLowerCase().includes(currentSearch) || (p.desc && p.desc.toLowerCase().includes(currentSearch));
+return matchF && matchS;
+});
+const grouped = {};
+CATS.forEach(c => { grouped[c.key] = []; });
+visible.forEach(p => { if (grouped[p.cat]) grouped[p.cat].push(p); });
+let html = '';
+CATS.forEach(c => {
+const items = grouped[c.key];
+if (!items.length) return;
+html += `<div class="section-block"><div class="section-label">${c.label} — ${items.length} projet${items.length>1?'s':''}</div><div class="grid">${items.map(cardHTML).join('')}</div></div>`;
+});
+main.innerHTML = html || '<div style="text-align:center;color:var(--text-m);padding:60px 0;">Aucun projet trouve</div>';
+updateStats();
+}
+
+function cardHTML(p) {
+const prog = calcProg(p);
+const fillClass = prog >= 70 ? 'high' : prog >= 30 ? 'med' : 'low';
+const badgeLabel = p.status === 'actif' ? 'En cours' : p.status === 'planifie' ? 'Planifie' : 'Termine';
+const phases = p.phases || [];
+const donePh = phases.filter(ph => ph.state === 'done').length;
+return `<div class="card" onclick="openDetail(${p.id})">
+<div class="card-top"><div class="card-title">${escapeHtml(p.title)}</div><span class="badge ${p.status}">${badgeLabel}</span></div>
+<div class="card-desc">${escapeHtml(p.desc.substring(0,100))}...</div>
+<div><div class="prog-row"><span>${donePh}/${phases.length} phases</span><span class="prog-pct">${prog}%</span></div><div class="prog-bar"><div class="prog-fill ${fillClass}" style="width:${prog}%"></div></div></div>
+<div class="card-footer"><span>Prochaine : ${p.nextStep ? escapeHtml(p.nextStep.substring(0,40))+'…' : '—'}</span><span class="link-detail">Voir &rsaquo;</span></div>
+</div>`;
+}
+
+function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+
+function updateStats() {
+document.getElementById('s-total').textContent = projects.length;
+document.getElementById('s-actifs').textContent = projects.filter(p => p.status === 'actif').length;
+const avg = projects.length ? Math.round(projects.reduce((s,p) => s + calcProg(p), 0) / projects.length) : 0;
+document.getElementById('s-avg').textContent = avg + '%';
+}
+
+function openDetail(id) {
+const p = projects.find(x => x.id === id);
+if (!p) return;
+const prog = calcProg(p);
+const phases = p.phases || [];
+const donePh = phases.filter(ph => ph.state === 'done').length;
+const fillClass = prog >= 70 ? 'high' : prog >= 30 ? 'med' : 'low';
+const badgeLabel = p.status === 'actif' ? 'En cours' : p.status === 'planifie' ? 'Planifie' : 'Termine';
+document.getElementById('d-hdr').innerHTML = `<div class="modal-hdr-text"><div class="modal-hdr-title">${escapeHtml(p.title)}</div><div class="modal-hdr-sub">${escapeHtml(p.desc)}</div><span class="badge ${p.status}" style="margin-top:10px;display:inline-flex">${badgeLabel}</span></div><button class="btn-x" onclick="closeModal()">X</button>`;
+const phasesHTML = phases.map(ph => `<div class="phase ${ph.state}"><div class="phase-hdr"><div class="dot"></div><div class="phase-name">${escapeHtml(ph.name)}</div><span class="phase-tag">${ph.state==='done'?'Termine':ph.state==='in_progress'?'En cours':'A faire'}</span></div><ul class="phase-items">${ph.items.map(i=>`<li>${escapeHtml(i)}</li>`).join('')}</ul></div>`).join('');
+const livsHTML = (p.livrables && p.livrables.length) ? `<div class="livrables-ttl">Livrables</div>${p.livrables.map(l => `<div class="livrable-item"><div><div class="livrable-name">${escapeHtml(l.name)}</div><div class="livrable-type">${escapeHtml(l.type)}</div></div><a class="btn-open" href="${l.url}" target="_blank">Ouvrir</a></div>`).join('')}` : '';
+document.getElementById('d-body').innerHTML = `<div class="modal-prog-bloc"><div class="big-pct">${prog}<span>%</span></div><div class="prog-detail"><div class="prog-detail-label">${donePh} phase${donePh>1?'s':''} terminee${donePh>1?'s':''} sur ${phases.length}</div><div class="prog-detail-bar"><div class="prog-detail-fill ${fillClass}" style="width:${prog}%"></div></div></div></div>${p.nextStep ? `<div class="next-step-bloc"><div class="next-step-lbl">Prochaine etape</div><div class="next-step-val">${escapeHtml(p.nextStep)}</div></div>` : ''}<div class="phases-ttl">Planning & Etapes</div>${phasesHTML}${p.stack ? `<div class="stack-bloc"><div class="stack-lbl">Stack</div><div class="stack-val">${escapeHtml(p.stack)}</div></div>` : ''}${livsHTML}`;
+document.getElementById('btn-edit-proj').onclick = () => { closeModal(); openEdit(id); };
+document.getElementById('btn-del-proj').onclick = () => { if(confirm('Supprimer ce projet ?')) { projects = projects.filter(x=>x.id!==id); persistProjects(); closeModal(); render(); }};
+document.getElementById('ov-detail').classList.add('open');
+}
+
+function closeModal() { document.getElementById('ov-detail').classList.remove('open'); }
+
+function openAdd() {
+document.getElementById('form-title').textContent = 'Nouveau projet';
+document.getElementById('f-id').value = '';
+document.getElementById('f-title').value = '';
+document.getElementById('f-desc').value = '';
+document.getElementById('f-status').value = 'actif';
+document.getElementById('f-cat').value = 'business';
+document.getElementById('f-prog').value = '0';
+document.getElementById('f-next').value = '';
+document.getElementById('f-stack').value = '';
+document.getElementById('ov-form').classList.add('open');
+}
+
+function openEdit(id) {
+const p = projects.find(x => x.id === id);
+if (!p) return;
+document.getElementById('form-title').textContent = 'Modifier le projet';
+document.getElementById('f-id').value = id;
+document.getElementById('f-title').value = p.title;
+document.getElementById('f-desc').value = p.desc || '';
+document.getElementById('f-status').value = p.status;
+document.getElementById('f-cat').value = p.cat;
+document.getElementById('f-prog').value = calcProg(p);
+document.getElementById('f-next').value = p.nextStep || '';
+document.getElementById('f-stack').value = p.stack || '';
+document.getElementById('ov-form').classList.add('open');
+}
+
+function saveProject() {
+const id = document.getElementById('f-id').value;
+const title = document.getElementById('f-title').value.trim();
+if (!title) { alert('Le nom du projet est obligatoire.'); return; }
+if (id) {
+const idx = projects.findIndex(x => x.id == id);
+if (idx > -1) {
+projects[idx].title = title;
+projects[idx].desc = document.getElementById('f-desc').value;
+projects[idx].status = document.getElementById('f-status').value;
+projects[idx].cat = document.getElementById('f-cat').value;
+projects[idx].nextStep = document.getElementById('f-next').value;
+projects[idx].stack = document.getElementById('f-stack').value;
+}
+} else {
+projects.push({
+id: Date.now(),
+cat: document.getElementById('f-cat').value,
+status: document.getElementById('f-status').value,
+title: title,
+desc: document.getElementById('f-desc').value,
+nextStep: document.getElementById('f-next').value,
+stack: document.getElementById('f-stack').value,
+livrables: [],
+phases: [
+{ name: "Phase 1 — Demarrage", state: "in_progress", items: ["A definir"] },
+{ name: "Phase 2 — Developpement", state: "todo", items: ["A definir"] },
+{ name: "Phase 3 — Finalisation", state: "todo", items: ["A definir"] }
+]
+});
+}
+persistProjects();
+closeForm();
+render();
+}
+
+function closeForm() { document.getElementById('ov-form').classList.remove('open'); }
+
+function filter(f, btn) {
+currentFilter = f;
+document.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
+btn.classList.add('active');
+render();
+}
+
+function search(v) {
+currentSearch = v.toLowerCase();
+render();
+}
+
+function closeOv(e, id) {
+if (e.target === document.getElementById(id)) {
+document.getElementById(id).classList.remove('open');
+}
+}
+
+async function loadFlashReport() {
+const flashContent = document.getElementById('flash-content');
+flashContent.innerHTML = '<div class="loading">Chargement du rapport matinal...</div>';
+const demoData = {
+voyages21: { articlesTendance: ['Circuits Maroc 2026', 'Voyage luxe Marrakech'], modificationsSEO: 'Ajout schema.org', demandes: 12, affiliation: '3 influenceurs' },
+prospection: { scrapes: 247, retenus: 48, envoyes: 32, reponses: 5, suites: 8 },
+veille: { tendancesSEO: '+47% recherche eco', sujets: ['Atlas', 'Marrakech'], destinationsTendance: ['Merzouga', 'Chefchaouen'] },
+emails: [{ expediteur: 'booking@viator.com', resume: 'Proposition commission 12%' }]
+};
+displayFlashReport(demoData);
+}
+
+function displayFlashReport(data) {
+const html = `<div class="flash-grid"><div class="flash-card"><h4>Voyages 21</h4><p>Articles : ${data.voyages21?.articlesTendance?.join(', ') || '—'}</p><p>SEO : ${data.voyages21?.modificationsSEO || '—'}</p><p>Demandes : ${data.voyages21?.demandes || 0}</p><p>Affiliation : ${data.voyages21?.affiliation || '—'}</p></div><div class="flash-card"><h4>Prospection</h4><p>Scrapes : ${data.prospection?.scrapes || 0}</p><p>Retenus : ${data.prospection?.retenus || 0}</p><p>Envois : ${data.prospection?.envoyes || 0}</p><p>Reponses : ${data.prospection?.reponses || 0}</p><p>Suites : ${data.prospection?.suites || 0}</p></div><div class="flash-card"><h4>Veille Angels</h4><p>Tendances : ${data.veille?.tendancesSEO || '—'}</p><p>Sujets : ${data.veille?.sujets?.slice(0,2).join(', ') || '—'}</p><p>Destinations : ${data.veille?.destinationsTendance?.slice(0,3).join(', ') || '—'}</p></div></div><div class="flash-emails"><h4>Emails recus</h4>${data.emails?.map(e => `<div class="email-item"><strong>${escapeHtml(e.expediteur)}</strong> — ${escapeHtml(e.resume)}</div>`).join('') || '<div>Aucun email</div>'}</div>`;
+document.getElementById('flash-content').innerHTML = html;
+document.getElementById('flash-date').textContent = new Date().toLocaleDateString('fr-FR', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+function refreshFlash() { loadFlashReport(); }
+
+loadProjects();
+render();
+loadFlashReport();
+</script>
+</body>
+</html>
