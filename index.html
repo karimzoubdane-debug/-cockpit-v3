@@ -487,6 +487,71 @@ transition: border-color 0.2s;
 .btn-submit { width: 100%; background: var(--blue); color: #fff; border: none; padding: 12px; border-radius: 8px; font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s; margin-top: 6px; }
 .btn-submit:hover { background: var(--blue-l); }
 
+/* GITHUB SYNC */
+.gh-line {
+font-size: 11px;
+font-family: 'DM Mono', monospace;
+color: #4ade80;
+line-height: 1.5;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+.gh-line.err { color: var(--orange); }
+.gh-line.wait { color: var(--text-m); }
+.gh-meta {
+font-size: 11px;
+color: var(--text-m);
+font-family: 'DM Mono', monospace;
+margin-bottom: 10px;
+line-height: 1.6;
+}
+.gh-meta.err { color: var(--orange); }
+.commit-item {
+display: flex;
+gap: 12px;
+align-items: baseline;
+padding: 7px 12px;
+border: 1px solid var(--border);
+border-radius: 7px;
+margin-bottom: 5px;
+background: var(--bg3);
+}
+.commit-date { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--blue-l); flex-shrink: 0; }
+.commit-msg { font-size: 12px; color: var(--text); line-height: 1.5; }
+
+/* PROMPT DE REPRISE */
+.prompt-bloc { margin-top: 20px; }
+.prompt-pre {
+white-space: pre-wrap;
+word-break: break-word;
+background: #0a0e14;
+border: 1px solid var(--border2);
+border-radius: 8px;
+padding: 14px 16px;
+font-family: 'DM Mono', monospace;
+font-size: 11.5px;
+color: #c9d4e8;
+line-height: 1.65;
+max-height: 320px;
+overflow-y: auto;
+}
+.btn-copy {
+background: var(--blue);
+color: #fff;
+border: none;
+padding: 8px 18px;
+border-radius: 7px;
+font-family: 'Sora', sans-serif;
+font-size: 12px;
+font-weight: 700;
+cursor: pointer;
+margin-bottom: 10px;
+transition: background 0.2s;
+}
+.btn-copy:hover { background: var(--blue-l); }
+.btn-copy.ok { background: var(--green); }
+
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
@@ -507,6 +572,8 @@ header, .toolbar, .main, .flash-ia { padding-left: 16px; padding-right: 16px; ma
 <div class="hstat"><div class="hstat-val" id="s-total">0</div><div class="hstat-lbl">Projets</div></div>
 <div class="hstat"><div class="hstat-val" id="s-actifs">0</div><div class="hstat-lbl">Actifs</div></div>
 <div class="hstat"><div class="hstat-val" id="s-avg">0%</div><div class="hstat-lbl">Avancement moy.</div></div>
+<div class="hstat"><div class="hstat-val" id="s-gh">—</div><div class="hstat-lbl">Synchro GitHub</div></div>
+<button class="btn-ghost btn" onclick="syncGitHub(true)" title="Recharger les donnees GitHub">&#10227; GitHub</button>
 <button class="btn" onclick="openAdd()">+ Nouveau projet</button>
 </div>
 </header>
@@ -528,6 +595,7 @@ header, .toolbar, .main, .flash-ia { padding-left: 16px; padding-right: 16px; ma
 <button class="chip" onclick="filter('planifie',this)">Planifies</button>
 <button class="chip" onclick="filter('termine',this)">Termines</button>
 <button class="chip" onclick="filter('agent',this)">Agents IA</button>
+<button class="chip" onclick="filter('apps',this)">Apps & Outils</button>
 <input class="search-input" type="text" placeholder="Rechercher un projet..." oninput="search(this.value)">
 </div>
 
@@ -578,6 +646,7 @@ header, .toolbar, .main, .flash-ia { padding-left: 16px; padding-right: 16px; ma
 <option value="business">Business Voyages 21</option>
 <option value="eco">Ecotourisme & Immobilier</option>
 <option value="web">Creation de Sites Web</option>
+<option value="apps">Applications & Outils IA</option>
 <option value="agent">Armee des Anges — Agents IA</option>
 <option value="veille">Veille & Expertise</option>
 </select>
@@ -604,7 +673,7 @@ header, .toolbar, .main, .flash-ia { padding-left: 16px; padding-right: 16px; ma
 
 <script>
 const defaultProjects = [
-{ id:1, cat:'business', status:'actif', title:'Plateforme Web Voyages21.com', desc:"Refonte complete du site vitrine et de reservation en Next.js avec 4 langues (FR/EN/ES/DE), connecte a Sanity CMS, HubSpot CRM, Make.com, Rewardful.", nextStep:"Demarrer les pages site — Phase 3 : Page d'accueil en priorite", stack:"Next.js · Tailwind CSS · Sanity.io · Vercel Pro · GitHub · HubSpot · Make.com · DeepL · Rewardful · PayPal", livrables:[{name:"Feuille de Route — Site Voyages21", type:"Google Doc", url:"https://docs.google.com/document/d/1O-8jWqXlBProA3IYCUjmTUDYckE4FzT4v9363Pzo9VY/edit"},{name:"Decision Phase 2 Photos — Vision API", type:"Google Doc", url:"https://docs.google.com/document/d/1GLlZ7W_fdRYRthyj9fq1LQvsiDyX6-9eV8R9RPHA1yQ/edit"},{name:"Site en ligne (Vercel)", type:"URL", url:"https://voyages21.vercel.app"}], phases:[{name:"Phase 1 — Infrastructure", state:"done", items:["VS Code installe","Node.js v24 + npm v11","Next.js + Tailwind CSS cree","GitHub : karimzoubdane-debug/voyages21","Vercel : voyages21.vercel.app en ligne","Sanity.io CMS installe","Google Drive dossiers photos crees"]},{name:"Phase 2 — Automatisation Photos", state:"in_progress", items:["Script Google Apps Script + Vision AI (en cours)","Dispatch par mot-cle dans nom de fichier","DECISION : Switcher Claude Vision API (~$0.003/photo) apres fin du site","Renommage SEO automatique FR+EN"]},{name:"Phase 3 — Pages Site", state:"todo", items:["Page d'accueil","Page Circuits","Pages Activites","Page Contact / Devis","Integration Sanity (contenu)","4 langues : FR / EN / ES / DE"]},{name:"Phase 4 — Lancement", state:"todo", items:["Connecter domaine voyages21.com (Valablue → Vercel)","Migration emails AVANT quitter Valablue","Make.com automations","HubSpot CRM operationnel","Rewardful affiliation","DeepL integration"]}] },
+{ id:1, cat:'business', status:'actif', title:'Plateforme Web Voyages21.com', github:'karimzoubdane-debug/voyages21', desc:"Site web de l'agence Voyages 21 (voyages sur mesure au Maroc depuis 2000), developpe en Next.js 14 App Router + CSS Modules. V1 en production sur Vercel : header 3 barres avec mega menus au clic (Inspirations, Styles, Explorer), pages Accueil / About / Contact, design vert foret & or.", nextStep:"Enrichir le contenu (circuits, sejours) puis connecter le domaine voyages21.com", stack:"Next.js 14 · React · CSS Modules · Vercel · GitHub", refs:[{name:"Site en production (Vercel)", type:"URL", url:"https://voyages21.vercel.app"},{name:"Preview — branche de travail", type:"URL", url:"https://voyages21-git-claude-websi-3d5966-karimzoubdane-debugs-projects.vercel.app"}], promptNotes:"- WordPress, Elementor et WP Travel Engine sont definitivement abandonnes : ne JAMAIS les suggerer.\n- Stack imposee : Next.js 14 App Router, composants client React, CSS Modules.\n- Design system : vert foret #1B3A28 / #152E1F, or #C8A440, creme #F5F0E8 ; polices Playfair Display (titres, italic) et DM Sans (corps).\n- Header fixe 3 barres (48+40+68 = 156px), mega menus ouverts au CLIC uniquement (pas au survol).\n- Lire le fichier CLAUDE.md a la racine du depot avant toute modification.", livrables:[{name:"Feuille de Route — Site Voyages21", type:"Google Doc", url:"https://docs.google.com/document/d/1O-8jWqXlBProA3IYCUjmTUDYckE4FzT4v9363Pzo9VY/edit"},{name:"Decision Phase 2 Photos — Vision API", type:"Google Doc", url:"https://docs.google.com/document/d/1GLlZ7W_fdRYRthyj9fq1LQvsiDyX6-9eV8R9RPHA1yQ/edit"}], phases:[{name:"Phase 1 — Infrastructure", state:"done", items:["Next.js 14 + GitHub : karimzoubdane-debug/voyages21","Vercel : voyages21.vercel.app en ligne","CLAUDE.md — fiche projet et regles versionnees dans le depot"]},{name:"Phase 2 — V1 Site (header & pages)", state:"done", items:["Header 3 barres fixe avec mega menus au clic","Panels Inspirations / Choisissez votre style / Explorer","Pages Accueil, About (#expertise, #engagements), Contact","Footer vert fonce + bouton WhatsApp","V1 mise en production"]},{name:"Phase 3 — Contenu & Fonctionnel", state:"in_progress", items:["Pages circuits et sejours detaillees","Formulaire devis / contact operationnel","Photos : automatisation Vision API (decision Claude Vision ~$0.003/photo)","Multilingue FR / EN / ES / DE a planifier"]},{name:"Phase 4 — Lancement domaine", state:"todo", items:["Connecter domaine voyages21.com (Valablue → Vercel)","Migration emails AVANT de quitter Valablue","SEO, sitemap et indexation Google","HubSpot CRM + Make.com automations"]}] },
 { id:2, cat:'business', status:'actif', title:'Dossier Strategique B2B — Voyages 21', desc:"Production du catalogue complet des activites Voyages 21, de la presentation agence (78 slides), des grilles tarifaires multi-devises (MAD/USD/EUR) et de la strategie de prospection internationale B2B.", nextStep:"Finaliser la strategie OTA et configurer le pipeline HubSpot", stack:"PowerPoint · Google Drive · HTML/JS (configurateur) · HubSpot", livrables:[{name:"Presentation Agence Voyages21 (78 slides)", type:"PPTX", url:"https://drive.google.com/file/d/1WtcA3Go0SsV7H-muLXOV7K0AW_0XuJg2/view"},{name:"Presentation Agence — Partie 2", type:"PPTX", url:"https://drive.google.com/file/d/1l_lAGzeqSyB7lFfHJYZ9cNKpgidWdc4_/view"},{name:"Catalogue Voyages 21 — Merged", type:"PDF", url:"https://drive.google.com/file/d/1bUqIB3MkF7yQmzB_HtuTj2YwUr_tgSBk/view"}], phases:[{name:"Catalogue & Presentation", state:"done", items:["78 slides master B2B PPTX produit","Grilles tarifaires MAD/USD/EUR","Analyse OTA : Viator, Civitatis, Airbnb Experiences","Analyse marches Maroc 2026 (2,48 Mds USD)"]},{name:"Strategie Prospection", state:"in_progress", items:["SWOT Voyages 21 complet","Plan 12 mois — Budget ~217 400 MAD","Canaux : LinkedIn, Brevo, DMCFinder, ATTA","Salons cibles : WTM London / ITB Berlin"]},{name:"CRM & Deploiement", state:"todo", items:["HubSpot CRM pipeline B2B configure","Sequences emails Brevo","Reporting KPIs mensuel"]}] },
 { id:3, cat:'business', status:'actif', title:'Application Devis & Tarification', desc:"Outil web standalone (HTML/JavaScript) permettant a l'equipe finance de generer des devis clients en important les tarifs depuis les contrats hotels (Google Drive). Generation PDF automatique.", nextStep:"Developper l'interface de saisie et le moteur de calcul des marges", stack:"HTML · JavaScript · Google Drive API · PDF.js", livrables:[], phases:[{name:"Conception", state:"done", items:["Architecture standalone HTML/JS validee","Contrats hotels Drive = source de donnees","Equipe finance = utilisateurs cibles"]},{name:"Developpement", state:"in_progress", items:["Interface saisie devis","Import tarifs hotels depuis contrats","Calcul automatique marges et prix vente","Export PDF devis client"]},{name:"Deploiement", state:"todo", items:["Tests avec equipe finance","Formation utilisateurs","Mise en production","Mises a jour tarifaires regulieres"]}] },
 { id:4, cat:'business', status:'actif', title:'Strategie Commerciale Incoming', desc:"Plan complet de developpement commercial B2B pour attirer des Tour Operateurs et agences partenaires en Europe et Chine. Inclut strategie OTA, programme d'affiliation influenceurs, gestion CRM.", nextStep:"Configurer le pipeline HubSpot et lancer les sequences Brevo", stack:"HubSpot · Brevo · Make.com · LinkedIn · Viator · Civitatis · Rewardful", livrables:[{name:"Analyse OTA & Strategie Experiences Maroc", type:"Google Doc", url:"https://docs.google.com/document/d/1rT0Ef_D5dhan9VtSeV2aWyjK1cFfiviXsw1KNQtyqrc/edit"},{name:"Tendances Touristiques Maroc 2026 — 20 offres", type:"Google Doc", url:"https://docs.google.com/document/d/1usf6PXZsJ89L8XTihXRRfJuAA14w9SghUtWa0AjZuSk/edit"}], phases:[{name:"Analyse & Strategie", state:"done", items:["Analyse OTA : Viator/Civitatis/Airbnb","Tendances marche Maroc 2026","SWOT et positionnement Voyages 21","Circuits Golf & Casino VIP definis"]},{name:"Affiliation Influenceurs", state:"in_progress", items:["Criteres : Voyage/Luxe, Engagement >3%","Audience cible : Europe / Chine / USA","Plateforme Rewardful — commissions transparentes"]},{name:"CRM & Automation", state:"todo", items:["Pipeline HubSpot B2B","Sequences Brevo automatiques","Nurturing prospects 30 jours"]},{name:"OTAs — Referencement", state:"todo", items:["Inscription Viator (licence commerciale)","Dossier Civitatis (marche FR/ES)","Airbnb Experiences (guides experts)"]}] },
@@ -623,7 +692,13 @@ const defaultProjects = [
 { id:17, cat:'agent', status:'planifie', title:'Agent Createur — Contenu Social Media', desc:"Agent studio de contenu qui genere automatiquement posts, scripts et visuels pour Voyages 21 et HAYDEN 21, planifie 30 jours de contenu a l'avance sur tous les reseaux sociaux.", nextStep:"Definir la ligne editoriale et les templates de contenu par reseau", stack:"Make.com · Midjourney · Claude API · Buffer / Later · Canva API", livrables:[], phases:[{name:"Concept defini", state:"done", items:["Canaux : Instagram, Facebook, LinkedIn, TikTok","Objectif : 30 jours de contenu en avance","Connexion avec Agent Veilleur pour tendances"]},{name:"Configuration", state:"todo", items:["Templates posts par reseau","Generation visuels Midjourney / IA","Workflow planification automatique"]},{name:"Production", state:"todo", items:["Calendrier editorial rempli automatiquement","Reporting engagement hebdomadaire"]}] },
 { id:18, cat:'agent', status:'planifie', title:'Agent Architecte — Web & Automatisation', desc:"Agent technique qui developpe les outils web, sites clients et workflows Make.com. Applique les techniques premium (Google Stitch + Claude Code, composants 21st.dev, Vibe Coding).", nextStep:"Documenter les standards techniques et le workflow de livraison clients", stack:"Claude Code · VS Code · Next.js · Make.com · Vercel · GitHub · Google Stitch", livrables:[], phases:[{name:"Concept defini", state:"done", items:["Google Stitch (design) + Claude Code (code)","Composants 21st.dev pour designs premium","Vibe Coding : app complete en 12 min","Deploiement automatique GitHub → Vercel"]},{name:"Configuration", state:"todo", items:["Bibliotheque composants 21st.dev","Templates projets standardises","Workflow livraison clients documente"]},{name:"Production", state:"todo", items:["Livraison sites clients en autonomie partielle","Audits Ultra Review avant livraison"]}] },
 { id:19, cat:'agent', status:'planifie', title:'Agent Archiviste — Memoire & KPIs', desc:"Agent scribe qui lit les comptes-rendus de session stockes dans Google Drive, en extrait les KPIs et decisions cles, et met a jour automatiquement le tableau de bord.", nextStep:"Creer le template de compte-rendu standardise et le workflow Make.com", stack:"Make.com · Google Drive · Claude API · Google Sheets / Airtable", livrables:[{name:"Architecture Agent Archiviste", type:"Google Doc", url:"https://docs.google.com/document/d/1awS41Opq8L0EDbEOWwSczm4AsFj6uqLG7Q9RiPCZF0I/edit"}], phases:[{name:"Concept defini", state:"done", items:["Lit les CR Google Drive (nommage [PROJET]-DATE-TITRE)","Extrait : % realise / Reste a faire / KPI","Met a jour Dashboard automatiquement","Genere alerte si date Next Step depassee"]},{name:"Configuration", state:"todo", items:["Template CR standardise cree","Trigger Make.com : Watch New Files dans Drive","Parseur IA → extraction donnees structurees"]},{name:"Production", state:"todo", items:["Synchronisation continue Drive → Dashboard","Rapport hebdomadaire KPIs consolides"]}] },
-{ id:20, cat:'veille', status:'actif', title:'Veille Strategique IA — Formation Continue', desc:"Formation continue sur les capacites et evolutions de Claude et de ses concurrents (GPT-5.4, Gemini 3.1, GLM-5.1). Base de connaissance constituee dans Drive.", nextStep:"Appliquer les techniques Google Stitch et Skills Claude au projet Voyages 21", stack:"Claude · Obsidian · Google Drive · YouTube · Make.com", livrables:[{name:"PART 1 — Claude 4.7 Nouveautes", type:"PDF", url:"https://drive.google.com/file/d/15OyIAodGK_XBkBWAo-AOzIU7ZlFeQBb3/view"},{name:"PART 3 — Skills + Agents + Sites Premium", type:"PDF", url:"https://drive.google.com/file/d/1okYyDmoB6s-5KnJRIXCYgUm6rSeag-lb/view"},{name:"PART 4 — Vibe Coding + Fonctions avancees", type:"PDF", url:"https://drive.google.com/file/d/1AvYuVgHEQzy2GcfRzWJfK4nRNcEYPJ-8/view"},{name:"PART 5 — Obsidian + Architecture Advisor", type:"PDF", url:"https://drive.google.com/file/d/1aeZMKlIR4pWmFj5ijeOMsI-J4QtUL5jG/view"},{name:"PART 6 — Vision HD + Google Stitch", type:"PDF", url:"https://drive.google.com/file/d/1GQ6VwDPqKcYBGL7r-vBjr_iNJxPpibQ/view"},{name:"Recapitulatif General — Strategie Claude 2026", type:"Google Doc", url:"https://docs.google.com/document/d/1HwkapNsZA4eAHE5seLohqKbGJIC85AuyRUkmXVOlWUU/edit"}], phases:[{name:"Analyse 11 videos", state:"done", items:["Skills Claude (briques permanentes)","Equipe agents + revue croisee","Vibe Coding VS Code + Vercel","Obsidian + Claude Code (deuxieme cerveau)","Architecture Advisor Haiku/Opus (−50% couts)","Google Stitch + Claude Code (sites premium)"]},{name:"Application Pratique", state:"in_progress", items:["Appliquer Skills aux projets Voyages 21","Tester Google Stitch pour design site","Architecture Advisor pour automatisations"]},{name:"Veille Continue Automatisee", state:"todo", items:["Workflow YouTube → synthese → Drive","Agent Veilleur actif (Make.com + RSS)","Rapport hebdomadaire 5 innovations"]}] }
+{ id:20, cat:'veille', status:'actif', title:'Veille Strategique IA — Formation Continue', desc:"Formation continue sur les capacites et evolutions de Claude et de ses concurrents (GPT-5.4, Gemini 3.1, GLM-5.1). Base de connaissance constituee dans Drive.", nextStep:"Appliquer les techniques Google Stitch et Skills Claude au projet Voyages 21", stack:"Claude · Obsidian · Google Drive · YouTube · Make.com", livrables:[{name:"PART 1 — Claude 4.7 Nouveautes", type:"PDF", url:"https://drive.google.com/file/d/15OyIAodGK_XBkBWAo-AOzIU7ZlFeQBb3/view"},{name:"PART 3 — Skills + Agents + Sites Premium", type:"PDF", url:"https://drive.google.com/file/d/1okYyDmoB6s-5KnJRIXCYgUm6rSeag-lb/view"},{name:"PART 4 — Vibe Coding + Fonctions avancees", type:"PDF", url:"https://drive.google.com/file/d/1AvYuVgHEQzy2GcfRzWJfK4nRNcEYPJ-8/view"},{name:"PART 5 — Obsidian + Architecture Advisor", type:"PDF", url:"https://drive.google.com/file/d/1aeZMKlIR4pWmFj5ijeOMsI-J4QtUL5jG/view"},{name:"PART 6 — Vision HD + Google Stitch", type:"PDF", url:"https://drive.google.com/file/d/1GQ6VwDPqKcYBGL7r-vBjr_iNJxPpibQ/view"},{name:"Recapitulatif General — Strategie Claude 2026", type:"Google Doc", url:"https://docs.google.com/document/d/1HwkapNsZA4eAHE5seLohqKbGJIC85AuyRUkmXVOlWUU/edit"}], phases:[{name:"Analyse 11 videos", state:"done", items:["Skills Claude (briques permanentes)","Equipe agents + revue croisee","Vibe Coding VS Code + Vercel","Obsidian + Claude Code (deuxieme cerveau)","Architecture Advisor Haiku/Opus (−50% couts)","Google Stitch + Claude Code (sites premium)"]},{name:"Application Pratique", state:"in_progress", items:["Appliquer Skills aux projets Voyages 21","Tester Google Stitch pour design site","Architecture Advisor pour automatisations"]},{name:"Veille Continue Automatisee", state:"todo", items:["Workflow YouTube → synthese → Drive","Agent Veilleur actif (Make.com + RSS)","Rapport hebdomadaire 5 innovations"]}] },
+{ id:21, cat:'apps', status:'actif', title:'Reviews-Up — Avis Google & WhatsApp', github:'karimzoubdane-debug/reviews-up', desc:"Application de gestion IA des avis Google et de campagnes WhatsApp pour Voyages 21 : collecte d'avis clients apres les circuits, reponses assistees par IA et relances WhatsApp.", nextStep:"Verifier le deploiement Vercel et definir la prochaine fonctionnalite prioritaire", stack:"TypeScript · Next.js · Vercel · GitHub", refs:[], promptNotes:"- Lire le README du depot avant toute modification.\n- Ne jamais mettre de cles API en clair dans le code : utiliser les variables d'environnement Vercel.\n- Public cible : clients de l'agence Voyages 21 (voyageurs au Maroc), interface en francais.", livrables:[], phases:[{name:"Base applicative", state:"done", items:["Depot GitHub cree en TypeScript (juin 2026)","Structure application : avis Google + campagnes WhatsApp"]},{name:"Mise en service", state:"in_progress", items:["Deploiement Vercel a verifier","Connexion au compte Google Business Profile de Voyages 21","Configuration envoi WhatsApp (API ou liens wa.me)"]},{name:"Exploitation", state:"todo", items:["Campagne de collecte d'avis post-voyage automatisee","Reponses IA aux avis publies","Tableau de bord de suivi (note moyenne, volume, delais)"]}] },
+{ id:22, cat:'apps', status:'actif', title:'DA21 — LinkedRx (Audit LinkedIn IA)', github:'karimzoubdane-debug/DA21', desc:"Application d'audit de profil LinkedIn utilisant 3 modeles d'IA : analyse du profil (titre, photo, banniere, resume, contenu), score et recommandations d'optimisation avec plan d'action.", nextStep:"Tester l'audit sur des profils reels et fiabiliser les 3 modeles IA", stack:"TypeScript · Next.js · 3 modeles IA (multi-provider) · Vercel · GitHub", refs:[], promptNotes:"- Lire le README du depot avant toute modification.\n- L'app compare les reponses de 3 modeles IA : conserver cette logique multi-modeles.\n- Ne jamais stocker les cles API en clair : variables d'environnement uniquement.", livrables:[], phases:[{name:"Base applicative", state:"done", items:["Depot GitHub cree en TypeScript (mai 2026)","Architecture audit avec 3 modeles IA"]},{name:"Fiabilisation", state:"in_progress", items:["Tests sur profils LinkedIn reels","Calibrage des recommandations (titre, banniere, contenu)","Gestion des erreurs et des quotas API"]},{name:"Lancement", state:"todo", items:["Deploiement public","Offre commerciale (audit gratuit → accompagnement payant)","Lien avec la prospection LinkedIn Voyages 21 / DA21"]}] },
+{ id:23, cat:'apps', status:'planifie', title:'REELSAPP — Repurposing Video IA', desc:"Outil IA de repurposing video : recherche de videos YouTube via l'API Data v3, scoring de viralite et pertinence, transcription (Whisper / AssemblyAI), segmentation intelligente (hooks, moments forts) et generation de 3 a 5 shorts 9:16 sous-titres par video, avec validation humaine et export.", nextStep:"Creer le depot GitHub et demarrer le MVP (architecture Next.js 15 + Supabase deja decidee)", stack:"Next.js 15 · TypeScript · Tailwind + shadcn/ui · PostgreSQL + Prisma · Supabase · YouTube Data API v3 · Whisper / AssemblyAI", refs:[{name:"Dossier REELSAPP (Drive)", type:"Dossier", url:"https://drive.google.com/drive/folders/1WOX5eSZOiOZs82mtS0rKBLp7bkeRb5Yf"},{name:"Cahier de charge REELSAPP", type:"DOCX", url:"https://drive.google.com/file/d/1nzmAe294dxxmOHNtJztUIy-Ayh_CpMC3/view"},{name:"Cahier de charge + sources [1-17]", type:"DOCX", url:"https://drive.google.com/file/d/1TAs8fOhZzxvrLvRntj6xi4RrDr2nbtYv/view"}], promptNotes:"- Respecter STRICTEMENT les regles YouTube contre le \"reused content\" : avertissements, transformation reelle du contenu, case a cocher de conformite.\n- Le cahier des charges complet (12 sections + 17 sources) est dans le dossier Drive REELSAPP : le lire en premier.\n- Un projet Supabase est deja cree pour REELSAPP (references dans le fichier LISTE DES ABONNEMENTS sur Drive).\n- Creer le depot GitHub des la premiere session et deployer tot sur Vercel.\n- Jobs asynchrones obligatoires pour l'analyse et la generation de clips (Inngest ou BullMQ).", livrables:[], phases:[{name:"Cadrage", state:"done", items:["Cahier des charges complet redige (12 sections)","17 sources et references officielles compilees","Stack decidee : Next.js 15 + PostgreSQL/Prisma + Supabase","Projet Supabase cree"]},{name:"MVP", state:"todo", items:["Depot GitHub + architecture technique detaillee","Auth + gestion de projets","Recherche YouTube (API Data v3) + scoring viralite","Transcription et segmentation IA","Generation 3-5 shorts 9:16 avec sous-titres"]},{name:"Validation & Export", state:"todo", items:["Interface de validation humaine","Export video + metadonnees","Conformite YouTube reused content"]}] },
+{ id:24, cat:'apps', status:'actif', title:'Cockpit V3 — Pilotage des Projets', github:'karimzoubdane-debug/-cockpit-v3', desc:"Ce tableau de bord lui-meme : vue 360 de tous les projets (references, avancement, phases, livrables), avec synchronisation automatique GitHub (derniers commits, activite, issues) et prompt de reprise IA copiable pour chaque projet.", nextStep:"Brancher les futurs depots GitHub (REELSAPP...) des leur creation", stack:"HTML · JavaScript · API GitHub (publique) · localStorage · Vercel", refs:[{name:"Cockpit en ligne (Vercel)", type:"URL", url:"https://cockpit-v3-eosin.vercel.app"}], promptNotes:"- Application volontairement mono-fichier index.html sans framework : conserver ce principe (simplicite, deploiement instantane).\n- Les donnees projets sont dans le tableau defaultProjects ; incrementer DATA_VERSION a chaque modification de ce tableau pour forcer la mise a jour chez l'utilisateur.\n- La synchro GitHub utilise l'API publique sans token (60 requetes/heure max) : conserver le cache localStorage d'1 heure.", livrables:[], phases:[{name:"V3 — Dashboard", state:"done", items:["Cartes projets par categorie, filtres, recherche","Modal detail : phases, livrables, stack","Ajout / edition / suppression de projets (localStorage)"]},{name:"V4 — Vue 360 + Synchro GitHub", state:"done", items:["Synchro auto API GitHub : commits, activite, issues","Fiches references (GitHub, Vercel, Drive)","Prompt de reprise IA genere et copiable par projet"]},{name:"Evolutions", state:"todo", items:["Connecter les nouveaux depots au fur et a mesure","Brancher le Flash IA sur des donnees reelles (Make.com)","Option : token GitHub pour depots prives"]}] },
+{ id:25, cat:'veille', status:'actif', title:'Formation Python — Prof Abderrahman', github:'karimzoubdane-debug/Prof-python-Abderrahman-', desc:"Espace de travail de la formation Python avec le professeur Abderrahman : supports de cours, exercices et travaux pratiques versionnes sur GitHub.", nextStep:"Poursuivre les exercices et versionner chaque seance", stack:"Python · HTML · GitHub", refs:[], promptNotes:"- Contexte : apprentissage de Python (niveau progressif), supports en francais.\n- Expliquer chaque notion simplement avec des exemples concrets avant les exercices.", livrables:[], phases:[{name:"Mise en place", state:"done", items:["Depot GitHub cree (mai 2026)","Premiers supports et exercices deposes"]},{name:"Apprentissage", state:"in_progress", items:["Seances regulieres avec le prof Abderrahman","Exercices pratiques versionnes"]},{name:"Application", state:"todo", items:["Mini-projets Python utiles a Voyages 21 (scripts, automatisations)","Lien avec les agents IA (Make.com, API)"]}] },
+{ id:26, cat:'business', status:'termine', title:'Mini-site — Circuit Sud Maroc (Etienne & Rabii)', github:'karimzoubdane-debug/sud-maroc-aventure-avec-Etienne-', desc:"Mini-site HTML presentant le circuit sud Maroc organise avec Etienne et Rabii en avril 2026 : itineraire, etapes et informations pratiques. Sert de modele reutilisable pour les prochains circuits clients.", nextStep:"Reutiliser ce modele pour les prochains circuits clients personnalises", stack:"HTML · GitHub · Vercel", refs:[], promptNotes:"- Projet termine : il sert de MODELE. Pour un nouveau circuit, dupliquer la structure (itineraire jour par jour, cartes, infos pratiques) avec les nouvelles donnees client.", livrables:[], phases:[{name:"Realisation", state:"done", items:["Page circuit complete (itineraire avril 2026)","Depot GitHub publie","Voyage realise avec Etienne & Rabii"]}] }
 ];
 
 let projects = [];
@@ -632,12 +707,23 @@ function persistProjects() {
 localStorage.setItem('cockpit_projects', JSON.stringify(projects));
 }
 
+/* Incrementer DATA_VERSION a chaque modification de defaultProjects :
+   les fiches par defaut sont alors rechargees chez l'utilisateur,
+   les projets ajoutes a la main (id = timestamp) sont conserves. */
+const DATA_VERSION = 2;
+
 function loadProjects() {
 const stored = localStorage.getItem('cockpit_projects');
-if (stored) {
+const storedVersion = localStorage.getItem('cockpit_data_version');
+if (stored && storedVersion == DATA_VERSION) {
 projects = JSON.parse(stored);
 } else {
-projects = JSON.parse(JSON.stringify(defaultProjects));
+let userAdded = [];
+if (stored) {
+try { userAdded = JSON.parse(stored).filter(p => p.id > 100000); } catch(e) {}
+}
+projects = JSON.parse(JSON.stringify(defaultProjects)).concat(userAdded);
+localStorage.setItem('cockpit_data_version', DATA_VERSION);
 persistProjects();
 }
 }
@@ -658,6 +744,7 @@ const CATS = [
 { key:'business', label:'Business Voyages 21' },
 { key:'eco', label:'Ecotourisme & Immobilier' },
 { key:'web', label:'Creation de Sites Web' },
+{ key:'apps', label:'Applications & Outils IA' },
 { key:'agent', label:'Armee des Anges — Agents IA' },
 { key:'veille', label:'Veille & Expertise' }
 ];
@@ -691,10 +778,18 @@ const fillClass = prog >= 70 ? 'high' : prog >= 30 ? 'med' : 'low';
 const badgeLabel = p.status === 'actif' ? 'En cours' : p.status === 'planifie' ? 'Planifie' : 'Termine';
 const phases = p.phases || [];
 const donePh = phases.filter(ph => ph.state === 'done').length;
+let ghLine = '';
+if (p.github) {
+const g = ghData[p.github];
+if (g && g.error) ghLine = `<div class="gh-line err">&#10227; GitHub indisponible (reessayer plus tard)</div>`;
+else if (g && g.pushed) ghLine = `<div class="gh-line" title="${escapeHtml(g.commits && g.commits[0] ? g.commits[0].m : '')}">&#10227; GitHub · MAJ ${timeAgo(g.pushed)}${g.commits && g.commits[0] ? ' — ' + escapeHtml(g.commits[0].m.substring(0,42)) : ''}</div>`;
+else ghLine = `<div class="gh-line wait">&#10227; GitHub : synchronisation...</div>`;
+}
 return `<div class="card" onclick="openDetail(${p.id})">
 <div class="card-top"><div class="card-title">${escapeHtml(p.title)}</div><span class="badge ${p.status}">${badgeLabel}</span></div>
 <div class="card-desc">${escapeHtml(p.desc.substring(0,100))}...</div>
 <div><div class="prog-row"><span>${donePh}/${phases.length} phases</span><span class="prog-pct">${prog}%</span></div><div class="prog-bar"><div class="prog-fill ${fillClass}" style="width:${prog}%"></div></div></div>
+${ghLine}
 <div class="card-footer"><span>Prochaine : ${p.nextStep ? escapeHtml(p.nextStep.substring(0,40))+'…' : '—'}</span><span class="link-detail">Voir &rsaquo;</span></div>
 </div>`;
 }
@@ -719,7 +814,24 @@ const badgeLabel = p.status === 'actif' ? 'En cours' : p.status === 'planifie' ?
 document.getElementById('d-hdr').innerHTML = `<div class="modal-hdr-text"><div class="modal-hdr-title">${escapeHtml(p.title)}</div><div class="modal-hdr-sub">${escapeHtml(p.desc)}</div><span class="badge ${p.status}" style="margin-top:10px;display:inline-flex">${badgeLabel}</span></div><button class="btn-x" onclick="closeModal()">X</button>`;
 const phasesHTML = phases.map(ph => `<div class="phase ${ph.state}"><div class="phase-hdr"><div class="dot"></div><div class="phase-name">${escapeHtml(ph.name)}</div><span class="phase-tag">${ph.state==='done'?'Termine':ph.state==='in_progress'?'En cours':'A faire'}</span></div><ul class="phase-items">${ph.items.map(i=>`<li>${escapeHtml(i)}</li>`).join('')}</ul></div>`).join('');
 const livsHTML = (p.livrables && p.livrables.length) ? `<div class="livrables-ttl">Livrables</div>${p.livrables.map(l => `<div class="livrable-item"><div><div class="livrable-name">${escapeHtml(l.name)}</div><div class="livrable-type">${escapeHtml(l.type)}</div></div><a class="btn-open" href="${l.url}" target="_blank">Ouvrir</a></div>`).join('')}` : '';
-document.getElementById('d-body').innerHTML = `<div class="modal-prog-bloc"><div class="big-pct">${prog}<span>%</span></div><div class="prog-detail"><div class="prog-detail-label">${donePh} phase${donePh>1?'s':''} terminee${donePh>1?'s':''} sur ${phases.length}</div><div class="prog-detail-bar"><div class="prog-detail-fill ${fillClass}" style="width:${prog}%"></div></div></div></div>${p.nextStep ? `<div class="next-step-bloc"><div class="next-step-lbl">Prochaine etape</div><div class="next-step-val">${escapeHtml(p.nextStep)}</div></div>` : ''}<div class="phases-ttl">Planning & Etapes</div>${phasesHTML}${p.stack ? `<div class="stack-bloc"><div class="stack-lbl">Stack</div><div class="stack-val">${escapeHtml(p.stack)}</div></div>` : ''}${livsHTML}`;
+const allRefs = [];
+if (p.github) allRefs.push({name:'Depot GitHub', type:'github.com/' + p.github, url:'https://github.com/' + p.github});
+(p.refs || []).forEach(r => allRefs.push(r));
+const refsHTML = allRefs.length ? `<div class="livrables-ttl">References</div>${allRefs.map(r => `<div class="livrable-item"><div><div class="livrable-name">${escapeHtml(r.name)}</div><div class="livrable-type">${escapeHtml(r.type)}</div></div><a class="btn-open" href="${r.url}" target="_blank">Ouvrir</a></div>`).join('')}` : '';
+let ghHTML = '';
+if (p.github) {
+const g = ghData[p.github];
+ghHTML = `<div class="livrables-ttl" style="margin-top:20px">Dernieres avancees — GitHub (mise a jour automatique)</div>`;
+if (g && !g.error && g.commits) {
+ghHTML += `<div class="gh-meta">Derniere activite : ${timeAgo(g.pushed)} · ${g.issues} issue(s) ouverte(s) · branche par defaut : ${escapeHtml(g.branch || 'main')}</div>` + g.commits.map(c => `<div class="commit-item"><span class="commit-date">${c.d.substring(0,10)}</span><span class="commit-msg">${escapeHtml(c.m)}</span></div>`).join('');
+} else if (g && g.error) {
+ghHTML += `<div class="gh-meta err">Donnees GitHub momentanement indisponibles — cliquez sur &#10227; GitHub en haut de page pour reessayer.</div>`;
+} else {
+ghHTML += `<div class="gh-meta">Synchronisation en cours...</div>`;
+}
+}
+const promptHTML = `<div class="prompt-bloc"><div class="livrables-ttl">Prompt de reprise IA — a coller dans Claude, ChatGPT, Gemini...</div><button class="btn-copy" onclick="copyPrompt(${p.id}, this)">Copier le prompt</button><div class="prompt-pre" id="prompt-pre-${p.id}">${escapeHtml(buildPrompt(p))}</div></div>`;
+document.getElementById('d-body').innerHTML = `<div class="modal-prog-bloc"><div class="big-pct">${prog}<span>%</span></div><div class="prog-detail"><div class="prog-detail-label">${donePh} phase${donePh>1?'s':''} terminee${donePh>1?'s':''} sur ${phases.length}</div><div class="prog-detail-bar"><div class="prog-detail-fill ${fillClass}" style="width:${prog}%"></div></div></div></div>${p.nextStep ? `<div class="next-step-bloc"><div class="next-step-lbl">Prochaine etape</div><div class="next-step-val">${escapeHtml(p.nextStep)}</div></div>` : ''}${refsHTML}${ghHTML}<div class="phases-ttl" style="margin-top:20px">Planning & Etapes</div>${phasesHTML}${p.stack ? `<div class="stack-bloc"><div class="stack-lbl">Stack</div><div class="stack-val">${escapeHtml(p.stack)}</div></div>` : ''}${livsHTML}${promptHTML}`;
 document.getElementById('btn-edit-proj').onclick = () => { closeModal(); openEdit(id); };
 document.getElementById('btn-del-proj').onclick = () => { if(confirm('Supprimer ce projet ?')) { projects = projects.filter(x=>x.id!==id); persistProjects(); closeModal(); render(); }};
 document.getElementById('ov-detail').classList.add('open');
@@ -831,9 +943,122 @@ document.getElementById('flash-date').textContent = new Date().toLocaleDateStrin
 
 function refreshFlash() { loadFlashReport(); }
 
+/* ============ SYNCHRO GITHUB (API publique, sans token) ============ */
+const GH_CACHE_KEY = 'cockpit_gh_cache';
+const GH_TTL = 3600000; /* cache 1h : l'API publique est limitee a 60 requetes/heure */
+let ghData = {};
+
+try { ghData = JSON.parse(localStorage.getItem(GH_CACHE_KEY)) || {}; } catch(e) { ghData = {}; }
+
+function timeAgo(iso) {
+const diff = Date.now() - new Date(iso).getTime();
+const min = Math.floor(diff / 60000);
+if (min < 1) return "a l'instant";
+if (min < 60) return 'il y a ' + min + ' min';
+const h = Math.floor(min / 60);
+if (h < 24) return 'il y a ' + h + ' h';
+const d = Math.floor(h / 24);
+if (d < 31) return 'il y a ' + d + ' jour' + (d > 1 ? 's' : '');
+const mo = Math.floor(d / 30);
+return 'il y a ' + mo + ' mois';
+}
+
+async function syncGitHub(force) {
+const slugs = [...new Set(projects.filter(p => p.github).map(p => p.github))];
+const now = Date.now();
+const toFetch = slugs.filter(s => force || !ghData[s] || ghData[s].error || (now - ghData[s].ts) > GH_TTL);
+if (!toFetch.length) { updateGhStat(); return; }
+document.getElementById('s-gh').textContent = '...';
+await Promise.all(toFetch.map(async slug => {
+try {
+const [repoRes, commitsRes] = await Promise.all([
+fetch('https://api.github.com/repos/' + slug),
+fetch('https://api.github.com/repos/' + slug + '/commits?per_page=5')
+]);
+if (!repoRes.ok || !commitsRes.ok) throw new Error('HTTP');
+const repo = await repoRes.json();
+const commits = await commitsRes.json();
+ghData[slug] = {
+ts: now,
+pushed: repo.pushed_at,
+issues: repo.open_issues_count,
+branch: repo.default_branch,
+commits: (Array.isArray(commits) ? commits : []).map(c => ({
+m: (c.commit.message || '').split('\n')[0],
+d: c.commit.author ? c.commit.author.date : ''
+}))
+};
+} catch(e) {
+if (!ghData[slug] || !ghData[slug].pushed) ghData[slug] = { ts: now, error: true };
+}
+}));
+try { localStorage.setItem(GH_CACHE_KEY, JSON.stringify(ghData)); } catch(e) {}
+updateGhStat();
+render();
+}
+
+function updateGhStat() {
+const slugs = projects.filter(p => p.github).map(p => p.github);
+const ok = slugs.filter(s => ghData[s] && !ghData[s].error).length;
+document.getElementById('s-gh').textContent = ok + '/' + slugs.length;
+}
+
+/* ============ PROMPT DE REPRISE IA ============ */
+function buildPrompt(p) {
+const g = p.github ? ghData[p.github] : null;
+let s = 'Tu es un expert senior (developpement, strategie et automatisation IA). Je te confie la reprise du projet « ' + p.title + ' » pour le faire evoluer. Voici tout le contexte.\n\n';
+s += 'QUI JE SUIS\nKarim Zoubdane, fondateur de Voyages 21, agence de voyages sur mesure au Maroc depuis 2000 (site : https://voyages21.vercel.app). Je developpe mes projets en collaboration avec des IA.\n\n';
+s += 'LE PROJET\n' + p.desc + '\n\n';
+if (p.stack) s += 'STACK / OUTILS\n' + p.stack + '\n\n';
+const done = [], enc = [], todo = [];
+(p.phases || []).forEach(ph => {
+const t = ph.name + ' : ' + ph.items.join(' ; ');
+if (ph.state === 'done') done.push(t);
+else if (ph.state === 'in_progress') enc.push(t);
+else todo.push(t);
+});
+if (done.length) s += 'DEJA REALISE\n- ' + done.join('\n- ') + '\n\n';
+if (enc.length) s += 'EN COURS\n- ' + enc.join('\n- ') + '\n\n';
+if (todo.length) s += 'RESTE A FAIRE\n- ' + todo.join('\n- ') + '\n\n';
+if (p.nextStep) s += 'PROCHAINE ETAPE PRIORITAIRE\n' + p.nextStep + '\n\n';
+const refs = [];
+if (p.github) refs.push('Depot GitHub : https://github.com/' + p.github + (g && g.branch ? ' (branche ' + g.branch + ')' : ''));
+(p.refs || []).forEach(r => refs.push(r.name + ' : ' + r.url));
+(p.livrables || []).forEach(l => refs.push(l.name + ' : ' + l.url));
+if (refs.length) s += 'REFERENCES\n- ' + refs.join('\n- ') + '\n\n';
+if (g && !g.error && g.commits && g.commits.length) s += 'DERNIERS COMMITS GITHUB (etat reel du code)\n- ' + g.commits.map(c => (c.d ? c.d.substring(0,10) : '') + ' : ' + c.m).join('\n- ') + '\n\n';
+if (p.promptNotes) s += 'REGLES SPECIFIQUES A RESPECTER\n' + p.promptNotes + '\n\n';
+s += 'METHODE DE TRAVAIL\n- Si un point est ambigu, pose-moi tes questions avant d\'agir.\n- Commence par un etat des lieux puis propose un plan d\'action en 3 a 5 etapes, et attends ma validation avant d\'executer.\n- Travaille par petites etapes validees, sans rien casser de l\'existant.\n- A la fin de la session, resume ce qui a ete fait et la prochaine etape.';
+return s;
+}
+
+function copyPrompt(id, btn) {
+const p = projects.find(x => x.id === id);
+if (!p) return;
+const text = buildPrompt(p);
+function ok() { btn.textContent = 'Copie ✓'; btn.classList.add('ok'); setTimeout(() => { btn.textContent = 'Copier le prompt'; btn.classList.remove('ok'); }, 2000); }
+if (navigator.clipboard && navigator.clipboard.writeText) {
+navigator.clipboard.writeText(text).then(ok).catch(() => fallbackCopy(text, ok));
+} else {
+fallbackCopy(text, ok);
+}
+}
+
+function fallbackCopy(text, ok) {
+const ta = document.createElement('textarea');
+ta.value = text;
+ta.style.position = 'fixed';
+ta.style.opacity = '0';
+document.body.appendChild(ta);
+ta.select();
+try { document.execCommand('copy'); ok(); } catch(e) { alert('Copie impossible — selectionnez le texte manuellement.'); }
+document.body.removeChild(ta);
+}
+
 loadProjects();
 render();
 loadFlashReport();
+syncGitHub(false);
 </script>
 </body>
 </html>
