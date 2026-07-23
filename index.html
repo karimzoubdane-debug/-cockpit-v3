@@ -561,6 +561,19 @@ white-space: nowrap;
 .btn-add-comment:hover { background: var(--blue-l); }
 .no-comment { font-size: 12px; color: var(--text-m); font-style: italic; padding: 8px 0; }
 
+/* REFRESH SPINNER + TOAST */
+.ref-ico { display: inline-block; }
+#btn-refresh.refreshing { opacity: 0.7; pointer-events: none; }
+#btn-refresh.refreshing .ref-ico { animation: cockpit-spin 0.8s linear infinite; }
+@keyframes cockpit-spin { to { transform: rotate(360deg); } }
+#cockpit-toast {
+position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+background: var(--bg3); color: var(--text); border: 1px solid var(--blue);
+border-radius: 10px; padding: 12px 20px; font-family: 'Sora', sans-serif;
+font-size: 13px; max-width: 92%; z-index: 300; box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+text-align: center; transition: opacity .3s; opacity: 0;
+}
+
 /* GITHUB SYNC */
 .gh-line {
 font-size: 11px;
@@ -647,7 +660,7 @@ header, .toolbar, .main, .flash-ia { padding-left: 16px; padding-right: 16px; ma
 <div class="hstat"><div class="hstat-val" id="s-actifs">0</div><div class="hstat-lbl">Actifs</div></div>
 <div class="hstat"><div class="hstat-val" id="s-avg">0%</div><div class="hstat-lbl">Avancement moy.</div></div>
 <div class="hstat"><div class="hstat-val" id="s-gh">—</div><div class="hstat-lbl">Synchro GitHub</div></div>
-<button class="btn-ghost btn" onclick="fullRefresh()" title="Tour 360 : met a jour tous les depots et detecte les nouveaux projets crees">&#10227; Tour 360</button>
+<button class="btn-ghost btn" id="btn-refresh" onclick="fullRefresh()" title="Tour 360 : met a jour tous les depots et detecte les nouveaux projets crees"><span class="ref-ico">&#10227;</span> Tour 360</button>
 <button class="btn-ghost btn" onclick="setGhToken()" title="Cle GitHub : necessaire pour detecter aussi les depots prives">&#128273;</button>
 <button class="btn" onclick="openAdd()">+ Nouveau projet</button>
 </div>
@@ -1194,8 +1207,11 @@ let _refreshing = false;
 async function fullRefresh() {
 if (_refreshing) return;
 _refreshing = true;
+const btn = document.getElementById('btn-refresh');
+if (btn) btn.classList.add('refreshing');
 const stat = document.getElementById('s-gh');
 if (stat) stat.textContent = '...';
+toast('Tour 360 en cours — mise a jour des depots...', 0);
 try {
 const res = await detectNewRepos();
 await syncGitHub(true);
@@ -1208,21 +1224,26 @@ toast('Tour 360 : ' + res.added + ' nouveau(x) projet(s) detecte(s) — ' + res.
 } else {
 toast('Tour 360 termine — tout est a jour' + (getGhToken() ? ', aucun nouveau projet.' : ' (depots publics uniquement — ajoute une cle 🔑 pour les prives).'));
 }
-} finally { _refreshing = false; }
+} catch (e) {
+toast('Erreur pendant le Tour 360 : ' + (e && e.message ? e.message : e));
+} finally {
+_refreshing = false;
+if (btn) btn.classList.remove('refreshing');
+}
 }
 
-function toast(msg) {
+function toast(msg, ms) {
 let el = document.getElementById('cockpit-toast');
 if (!el) {
 el = document.createElement('div');
 el.id = 'cockpit-toast';
-el.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--bg3);color:var(--text);border:1px solid var(--blue);border-radius:10px;padding:12px 20px;font-family:Sora,sans-serif;font-size:13px;max-width:90%;z-index:200;box-shadow:0 8px 30px rgba(0,0,0,0.5);text-align:center;transition:opacity .3s;';
 document.body.appendChild(el);
 }
 el.textContent = msg;
 el.style.opacity = '1';
 clearTimeout(el._t);
-el._t = setTimeout(function() { el.style.opacity = '0'; }, 6000);
+const delay = (ms === 0) ? 0 : (ms || 6000);
+if (delay) el._t = setTimeout(function() { el.style.opacity = '0'; }, delay);
 }
 
 /* ============ PROMPT DE REPRISE IA ============ */
