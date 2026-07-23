@@ -647,7 +647,8 @@ header, .toolbar, .main, .flash-ia { padding-left: 16px; padding-right: 16px; ma
 <div class="hstat"><div class="hstat-val" id="s-actifs">0</div><div class="hstat-lbl">Actifs</div></div>
 <div class="hstat"><div class="hstat-val" id="s-avg">0%</div><div class="hstat-lbl">Avancement moy.</div></div>
 <div class="hstat"><div class="hstat-val" id="s-gh">—</div><div class="hstat-lbl">Synchro GitHub</div></div>
-<button class="btn-ghost btn" onclick="syncGitHub(true)" title="Recharger les donnees GitHub">&#10227; GitHub</button>
+<button class="btn-ghost btn" onclick="fullRefresh()" title="Tour 360 : met a jour tous les depots et detecte les nouveaux projets crees">&#10227; Tour 360</button>
+<button class="btn-ghost btn" onclick="setGhToken()" title="Cle GitHub : necessaire pour detecter aussi les depots prives">&#128273;</button>
 <button class="btn" onclick="openAdd()">+ Nouveau projet</button>
 </div>
 </header>
@@ -656,7 +657,7 @@ header, .toolbar, .main, .flash-ia { padding-left: 16px; padding-right: 16px; ma
 <div class="flash-header">
 <div class="flash-title">Flash IA — Rapport quotidien</div>
 <div class="flash-date" id="flash-date"></div>
-<button class="btn-ghost" style="padding: 4px 12px; font-size: 11px;" onclick="refreshFlash()">Rafraichir</button>
+<button class="btn-ghost" style="padding: 4px 12px; font-size: 11px;" onclick="fullRefresh()">Rafraichir</button>
 </div>
 <div class="flash-content" id="flash-content">
 <div class="loading">Chargement du rapport matinal...</div>
@@ -798,7 +799,10 @@ let userAdded = [];
 if (stored) {
 try { userAdded = JSON.parse(stored).filter(p => p.id > 100000); } catch(e) {}
 }
-projects = JSON.parse(JSON.stringify(defaultProjects)).concat(userAdded);
+const defaults = JSON.parse(JSON.stringify(defaultProjects));
+const defSlugs = new Set(defaults.filter(p => p.github).map(p => p.github.toLowerCase()));
+const keep = userAdded.filter(p => !(p.github && defSlugs.has(p.github.toLowerCase())));
+projects = defaults.concat(keep);
 localStorage.setItem('cockpit_data_version', DATA_VERSION);
 persistProjects();
 }
@@ -1077,8 +1081,8 @@ document.getElementById('s-gh').textContent = '...';
 await Promise.all(toFetch.map(async slug => {
 try {
 const [repoRes, commitsRes] = await Promise.all([
-fetch('https://api.github.com/repos/' + slug),
-fetch('https://api.github.com/repos/' + slug + '/commits?per_page=5')
+fetch('https://api.github.com/repos/' + slug, { headers: ghHeaders() }),
+fetch('https://api.github.com/repos/' + slug + '/commits?per_page=5', { headers: ghHeaders() })
 ]);
 if (!repoRes.ok || !commitsRes.ok) throw new Error('HTTP');
 const repo = await repoRes.json();
@@ -1106,6 +1110,119 @@ function updateGhStat() {
 const slugs = projects.filter(p => p.github).map(p => p.github);
 const ok = slugs.filter(s => ghData[s] && !ghData[s].error).length;
 document.getElementById('s-gh').textContent = ok + '/' + slugs.length;
+}
+
+/* ============ TOUR 360 : detection auto + cle GitHub ============ */
+const GH_TOKEN_KEY = 'cockpit_gh_token';
+function getGhToken() { try { return localStorage.getItem(GH_TOKEN_KEY) || ''; } catch(e) { return ''; } }
+function ghHeaders() {
+const h = { 'Accept': 'application/vnd.github+json' };
+const t = getGhToken();
+if (t) h['Authorization'] = 'Bearer ' + t;
+return h;
+}
+function ghOwner() {
+const s = projects.find(p => p.github && p.github.indexOf('/') > 0);
+return s ? s.github.split('/')[0] : 'karimzoubdane-debug';
+}
+function setGhToken() {
+const cur = getGhToken();
+const t = prompt('Cle GitHub (token fine-grained, lecture seule sur tes depots).\n\nElle sert a lister TOUS tes depots — y compris prives — pour detecter les nouveaux projets.\nStockee uniquement dans CE navigateur (localStorage), jamais envoyee ailleurs qu\'a api.github.com.\n\nLaisse le champ vide et valide pour supprimer la cle enregistree.', cur);
+if (t === null) return;
+try {
+if (t.trim()) localStorage.setItem(GH_TOKEN_KEY, t.trim());
+else localStorage.removeItem(GH_TOKEN_KEY);
+} catch(e) {}
+fullRefresh();
+}
+function catOfName(name) {
+const n = (name || '').toLowerCase();
+if (/(compta|business|cession|devis|tarif|commercial|prospect|crm)/.test(n)) return 'business';
+if (/(agent|bot|orchestr|command|veilleur|archiviste)/.test(n)) return 'agent';
+if (/(veille|formation|python|prof|academi|revision|dictionnaire)/.test(n)) return 'veille';
+if (/(eco|hayden|oliv|maison|labdadz|tamazouzte|conciergerie)/.test(n)) return 'eco';
+if (/(site|web|next|vercel|voyages|chine|remotion|studio)/.test(n)) return 'web';
+return 'apps';
+}
+function titleOfRepo(name) { return (name || 'Projet').replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim(); }
+
+async function detectNewRepos() {
+const token = getGhToken();
+const owner = ghOwner();
+const existing = new Set(projects.filter(p => p.github).map(p => p.github.toLowerCase()));
+const repos = [];
+try {
+for (let page = 1; page <= 5; page++) {
+const url = token
+? 'https://api.github.com/user/repos?per_page=100&affiliation=owner&sort=created&page=' + page
+: 'https://api.github.com/users/' + owner + '/repos?per_page=100&sort=created&page=' + page;
+const res = await fetch(url, { headers: ghHeaders() });
+if (!res.ok) throw new Error('HTTP ' + res.status);
+const batch = await res.json();
+if (!Array.isArray(batch) || !batch.length) break;
+repos.push(...batch);
+if (batch.length < 100) break;
+}
+} catch(e) { return { added: 0, error: e.message }; }
+const self = (owner + '/-cockpit-v3').toLowerCase();
+const missing = repos.filter(r => {
+const slug = (r.full_name || '').toLowerCase();
+return slug && slug !== self && !r.archived && !existing.has(slug);
+});
+if (!missing.length) return { added: 0 };
+const base = Date.now();
+missing.forEach((r, i) => {
+projects.push({
+id: base + i, /* > 100000 : conserve comme projet ajoute par l'utilisateur */
+cat: catOfName(r.name), status: 'actif',
+title: titleOfRepo(r.name) + ' (auto)', github: r.full_name,
+desc: r.description || ('Depot ' + r.full_name + ' detecte automatiquement. Fiche a completer.'),
+nextStep: 'Cadrer le projet et definir la prochaine etape', stack: 'A definir',
+refs: [], promptNotes: '', livrables: [], comments: [],
+phases: [
+{ name: 'Cadrage', state: 'in_progress', items: ['Depot detecte automatiquement', 'A cadrer'] },
+{ name: 'Developpement', state: 'todo', items: ['A definir'] },
+{ name: 'Deploiement', state: 'todo', items: ['A definir'] }
+]
+});
+});
+persistProjects();
+return { added: missing.length, names: missing.map(r => r.full_name) };
+}
+
+let _refreshing = false;
+async function fullRefresh() {
+if (_refreshing) return;
+_refreshing = true;
+const stat = document.getElementById('s-gh');
+if (stat) stat.textContent = '...';
+try {
+const res = await detectNewRepos();
+await syncGitHub(true);
+render();
+loadFlashReport();
+if (res.error) {
+toast('Detection GitHub limitee (' + res.error + ')' + (getGhToken() ? '' : ' — clique sur la cle 🔑 pour ajouter un token et voir aussi tes depots prives.'));
+} else if (res.added) {
+toast('Tour 360 : ' + res.added + ' nouveau(x) projet(s) detecte(s) — ' + res.names.join(', '));
+} else {
+toast('Tour 360 termine — tout est a jour' + (getGhToken() ? ', aucun nouveau projet.' : ' (depots publics uniquement — ajoute une cle 🔑 pour les prives).'));
+}
+} finally { _refreshing = false; }
+}
+
+function toast(msg) {
+let el = document.getElementById('cockpit-toast');
+if (!el) {
+el = document.createElement('div');
+el.id = 'cockpit-toast';
+el.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--bg3);color:var(--text);border:1px solid var(--blue);border-radius:10px;padding:12px 20px;font-family:Sora,sans-serif;font-size:13px;max-width:90%;z-index:200;box-shadow:0 8px 30px rgba(0,0,0,0.5);text-align:center;transition:opacity .3s;';
+document.body.appendChild(el);
+}
+el.textContent = msg;
+el.style.opacity = '1';
+clearTimeout(el._t);
+el._t = setTimeout(function() { el.style.opacity = '0'; }, 6000);
 }
 
 /* ============ PROMPT DE REPRISE IA ============ */
