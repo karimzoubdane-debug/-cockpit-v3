@@ -1,0 +1,48 @@
+name: Cockpit — Detection auto des projets
+
+on:
+  schedule:
+    # Heures UTC. Le Maroc est en UTC+1 → minuit local = 23:00 UTC, 20h00 local = 19:00 UTC.
+    - cron: '0 23 * * *'   # Robot de minuit (heure Maroc)
+    - cron: '0 19 * * *'   # Mise a jour de 20h00 (heure Maroc)
+  workflow_dispatch: {}     # Permet aussi un lancement manuel depuis l'onglet Actions
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cockpit-auto-detect
+  cancel-in-progress: false
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Detecter les nouveaux depots et mettre a jour le cockpit
+        env:
+          # Le robot teste automatiquement les noms de secret les plus courants.
+          # Renommez votre secret en COCKPIT_PAT (recommande) ou gardez l'un de ceux-ci.
+          GH_TOKEN: ${{ secrets.COCKPIT_PAT || secrets.GH_PAT || secrets.PAT || secrets.GITHUB_PAT || secrets.PERSONAL_TOKEN || secrets.TOKEN }}
+          GH_OWNER: ${{ github.repository_owner }}
+        run: node scripts/detect-projects.mjs
+
+      - name: Commit si de nouveaux projets ont ete detectes
+        run: |
+          if [ -n "$(git status --porcelain index.html)" ]; then
+            git config user.name "cockpit-bot"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add index.html
+            git commit -m "Auto: detection de nouveaux projets ($(date -u +%Y-%m-%d\ %H:%MZ))"
+            git push
+            echo "Cockpit mis a jour."
+          else
+            echo "Aucun changement — rien a committer."
+          fi
